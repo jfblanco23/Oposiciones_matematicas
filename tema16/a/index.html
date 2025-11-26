@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>tema 16-a</title>
+    <link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tema 16 - Sistemas de ecuaciones lineales</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [["\\(", "\\)"]],
+        displayMath: [["\\[", "\\]"]],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="main-header">
+    <h1>TEMA 16</h1>
+    <h2>Discusión y Resolución de Sistemas de Ecuaciones Lineales. Teorema de Rouche. Regla de Cramer. Método de Gauss-Jordan</h2>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-button active" data-tab="intro">Introducción</button>
+    <button class="tab-button" data-tab="sistemas">Sistemas lineales</button>
+    <button class="tab-button" data-tab="tipos">Tipos de sistemas</button>
+    <button class="tab-button" data-tab="equivalencia">Teorema de equivalencia</button>
+    <button class="tab-button" data-tab="aplicacion">Aplicación lineal</button>
+    <button class="tab-button" data-tab="matrices">Matrices y rango</button>
+    <button class="tab-button" data-tab="triangulares">Sistemas triangulares</button>
+  </nav>
+
+  <main>
+    <!-- INTRODUCCIÓN -->
+    <section id="intro" class="tab-content active">
+      <h3>Introducción</h3>
+      <p>Los sistemas de ecuaciones lineales aparecen como un elemento esencial del que trata el Álgebra lineal
+        y cómo resolverlos ha sido uno de los problemas fundamentales en la historia.</p>
+      <p>Uno de los métodos de resolución de sistemas de ecuaciones lineales más importantes es el método de
+        eliminación de Gauss.</p>
+      <p>Este método consiste en transformar el sistema en un sistema equivalente obtenido mediante
+        operaciones elementales.</p>
+      <p>De las muchas aportaciones de Johann Carl Friedrich Gauss, podemos destacar la construcción de un
+        polígono regular de 17 lados con regla y compás, así como una solución algebraica al problema de
+        construir con regla y compás cualquier polígono regular de \(n\) lados.</p>
+      <p>En su tesis doctoral demostró el Teorema fundamental del álgebra, en el que se demuestra que toda
+        ecuación algebraica con coeficientes complejos tiene soluciones complejas.</p>
+      <p>Otras aportaciones importantes se relacionan con la Teoría de números y la Astronomía, calculando de
+        forma precisa la órbita de varios cuerpos celestes.</p>
+      <p>Denominado “el príncipe de las matemáticas”, Gauss ha contribuido de forma decisiva en el desarrollo
+        de esta ciencia.</p>
+    </section>
+
+    <!-- SISTEMAS DE ECUACIONES LINEALES -->
+    <section id="sistemas" class="tab-content">
+      <h3>Sistemas de ecuaciones lineales</h3>
+      <p>Un sistema se dirá homogéneo si el término independiente \(b_i = 0\), para todo \(i = 1, \dots, m\).</p>
+      <p>Es inmediato comprobar que todo sistema homogéneo es compatible, pues la \(n\)-upla \((0, \dots, 0)\)
+        es solución del mismo.</p>
+      <p class="math-block">
+        \[
+        \begin{cases}
+          a_{11}x_1 + a_{12}x_2 + \cdots + a_{1n}x_n = 0 \\
+          a_{21}x_1 + a_{22}x_2 + \cdots + a_{2n}x_n = 0 \\
+          \vdots \\
+          a_{m1}x_1 + a_{m2}x_2 + \cdots + a_{mn}x_n = 0
+        \end{cases}
+        \]
+      </p>
+      <p>
+        Si \((\bar{x}_1, \dots, \bar{x}_n)\) es solución, entonces \((\alpha \bar{x}_1, \dots, \alpha \bar{x}_n)\) también
+        es solución del sistema, para todo \(\alpha \in \mathbb{R}\).
+      </p>
+      <p>
+        Del mismo modo, si \((\bar{x}_1, \dots, \bar{x}_n)\) y \((\bar{y}_1, \dots, \bar{y}_n)\) son soluciones del sistema,
+        entonces la \(n\)-upla \((\bar{x}_1 + \bar{y}_1, \dots, \bar{x}_n + \bar{y}_n)\) también es solución del sistema.
+      </p>
+      <div class="boxed">
+        <h4>Proposición</h4>
+        <p>
+          Si \((\bar{x}_1, \dots, \bar{x}_n)\) es solución del sistema, entonces todas sus restantes soluciones se
+          escriben de la forma \((\bar{x}_1 + \alpha_1, \dots, \bar{x}_n + \alpha_n)\), donde
+          \((\alpha_1, \dots, \alpha_n)\) es solución de su sistema homogéneo asociado.
+        </p>
+      </div>
+      <h4>Notación matricial y vectorial</h4>
+      <p class="math-block">
+        \[
+        A = \begin{pmatrix}
+          a_{11} & a_{12} & \dots & a_{1n} \\
+          a_{21} & a_{22} & \dots & a_{2n} \\
+          \vdots & \vdots & \ddots & \vdots \\
+          a_{m1} & a_{m2} & \dots & a_{mn}
+        \end{pmatrix},\quad
+        X = \begin{pmatrix}
+          x_{1} \\ x_{2} \\ \vdots \\ x_{n}
+        \end{pmatrix},\quad
+        B = \begin{pmatrix}
+          b_{1} \\ b_{2} \\ \vdots \\ b_{m}
+        \end{pmatrix}
+        \]
+      </p>
+      <p>
+        El sistema se escribe como \(A \cdot X = B\).
+      </p>
+      <p class="math-block">
+        <!-- Matriz ampliada con línea vertical usando array con | en preámbulo -->
+        \[
+        \tilde{A} =
+        \left(
+          \begin{array}{cccc|c}
+            a_{11} & a_{12} & \cdots & a_{1n} & b_1 \\
+            a_{21} & a_{22} & \cdots & a_{2n} & b_2 \\
+            \vdots & \vdots & \ddots & \vdots & \vdots \\
+            a_{m1} & a_{m2} & \cdots & a_{mn} & b_m
+          \end{array}
+        \right)
+        \]
+      </p>
+      <p>
+        A esta matriz se la llama <strong>matriz ampliada</strong>.
+      </p>
+    </section>
+
+    <!-- TIPOS DE SISTEMAS -->
+    <section id="tipos" class="tab-content">
+      <h3>Tipos de sistemas</h3>
+      <p>La clasificación de los sistemas se hace atendiendo a la existencia de soluciones:</p>
+      <div style="text-align:center;">
+        <img src="1.png" alt="Tipos de sistemas" style="max-width:95%; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.08); margin:1rem 0;" />
+      </div>
+    </section>
+
+    <!-- TEOREMA DE EQUIVALENCIA -->
+    <section id="equivalencia" class="tab-content">
+      <h3>Teorema de equivalencia</h3>
+      <div class="boxed highlight-strong">
+        <h4>Enunciado del teorema</h4>
+        <p>Si en un sistema de ecuaciones lineales se sustituye la ecuación \(i\)-ésima por una combinación
+          lineal de dicha ecuación y las demás ecuaciones del sistema, siempre que el coeficiente que multiplique
+          a dicha ecuación \(i\)-ésima sea distinto de cero, el sistema resultante es equivalente al primero.</p>
+      </div>
+      <h4>Demostración paso a paso</h4>
+      <p>Pulsa el botón para resaltar cada paso de la demostración en amarillo. Siempre podrás ver lo escrito anteriormente.</p>
+      <button id="btn-equivalencia" class="step-button">Resaltar siguiente paso</button>
+      <div id="equivalencia-steps" class="step-container">
+        <div class="step" data-step="1">
+          <h5>Paso 1</h5>
+          <p>Dado el sistema</p>
+          <p class="math-block">
+            \[
+            \begin{cases}
+              E_1 \\
+              E_2 \\
+              \vdots \\
+              E_m
+            \end{cases}
+            \quad \text{(1)}
+            \]
+          </p>
+          <p>Sustituimos \(E_m\) por
+            \[
+              E_m + \sum_{j=1}^{m-1} \lambda_j E_j
+            \]
+          </p>
+        </div>
+        <div class="step" data-step="2">
+          <h5>Paso 2</h5>
+          <p>El nuevo sistema tiene las \(m-1\) primeras ecuaciones iguales y sólo cambia la última:</p>
+          <p class="math-block">
+            \[
+            \begin{cases}
+              E_1 \\
+              \vdots \\
+              E_{m-1} \\
+              E_m + \sum_{j=1}^{m-1} \lambda_j E_j
+            \end{cases}
+            \quad \text{(2)}
+            \]
+          </p>
+        </div>
+        <div class="step" data-step="3">
+          <h5>Paso 3</h5>
+          <p>Consideremos una solución \(\alpha = (\alpha_1, \ldots, \alpha_n)\) del sistema (1). Se verifica que</p>
+          <p class="math-block">\[
+          E_i(\alpha) = b_i \quad \forall i = 1, \ldots, m
+          \]</p>
+          <p>Multiplicando por \(\lambda_i\) y sumando:</p>
+          <p class="math-block">\[
+          \sum_{i=1}^{m} \lambda_i E_i(\alpha) = \sum_{i=1}^{m} \lambda_i b_i
+          \]</p>
+        </div>
+        <div class="step" data-step="4">
+          <h5>Paso 4</h5>
+          <p>Tomando \(\lambda_m = 1\), la última ecuación se escribe:</p>
+          <p class="math-block">\[
+          E_m(\alpha) + \sum_{j=1}^{m-1} \lambda_j E_j(\alpha) = b_m + \sum_{j=1}^{m-1} \lambda_j b_j
+          \]</p>
+          <p>Por tanto, \(\alpha\) también verifica la última ecuación del sistema (2). Las otras \(m-1\) ecuaciones son idénticas. Así, \(\alpha\) es solución de (2).</p>
+        </div>
+        <div class="step" data-step="5">
+          <h5>Paso 5</h5>
+          <p>Recíprocamente, si \(\alpha\) es solución de (2):</p>
+          <p class="math-block">\[
+          E_i(\alpha)=b_i \quad \forall i = 1,\dots,m-1
+          \]</p>
+          <p class="math-block">\[
+          \sum_{i=1}^{m-1} \lambda_i E_i(\alpha) + E_m(\alpha) = \sum_{i=1}^{m-1} \lambda_i b_i + b_m
+          \]</p>
+          <p>Despejando:</p>
+          <p class="math-block">\[
+          E_m(\alpha) = b_m
+          \]</p>
+          <p>Así que \(\alpha\) también es solución del sistema (1).</p>
+        </div>
+        <div class="step" data-step="6">
+          <h5>Paso 6</h5>
+          <p>Por lo tanto, cualquier solución de (1) lo es de (2) y viceversa. Ambos sistemas son equivalentes siempre que el coeficiente que multiplica a la ecuación elegida sea distinto de cero.</p>
+        </div>
+      </div>
+      <h4>Corolario</h4>
+      <p>Si en un sistema se suprime una ecuación que es combinación lineal de las restantes, el sistema obtenido es equivalente.</p>
+    </section>
+  <!-- APLICACIÓN LINEAL -->
+    <section id="aplicacion" class="tab-content">
+      <h3>Interpretación como aplicación lineal</h3>
+
+      <div class="boxed">
+        <p>
+          Consideramos el cuerpo \(K = \mathbb{R}\). Dado un sistema de \(m\) ecuaciones con \(n\) incógnitas,
+          escrito matricialmente como \(A X = B\), asociamos la aplicación lineal
+          \[
+          f : \mathbb{R}^n \to \mathbb{R}^m
+          \]
+          cuya matriz respecto de las bases canónicas es \(A\).
+        </p>
+      </div>
+
+      <p>
+        El vector columna \(X\) es un vector cualquiera \(x \in \mathbb{R}^n\) y \(B\) es un vector fijo
+        \(b \in \mathbb{R}^m\). El sistema se expresa como
+        \[
+        f(x) = b.
+        \]
+      </p>
+      <p>
+        El conjunto solución del sistema es \(f^{-1}(b)\). El sistema homogéneo asociado es
+        \[
+        f(x) = 0
+        \]
+        y sus soluciones son los elementos de \(f^{-1}(0) = \ker(f)\).
+      </p>
+
+      <h4>Proposición</h4>
+      <p>
+        El conjunto de soluciones de un sistema homogéneo forma un subespacio vectorial de \(\mathbb{R}^n\).
+      </p>
+      <p>
+        El conjunto de soluciones de un sistema no homogéneo se obtiene sumando a una solución particular
+        todas las soluciones del sistema homogéneo asociado.
+      </p>
+
+      <p class="math-block">
+        \[
+        f(\alpha + \alpha_K) = f(\alpha) + f(\alpha_K) = b + 0 = b,
+        \]
+      </p>
+      <p>
+        de modo que \(\alpha + \alpha_K\) es solución. Además, cualquier solución \(\beta\) puede escribirse
+        como \(\beta = \alpha + \alpha_K\) con \(\alpha_K \in \ker(f)\).
+      </p>
+
+      <h4>Clasificación en términos de \(f\)</h4>
+      <ul>
+        <li>Si \(b \notin \operatorname{Im}(f)\), entonces \(f^{-1}(b) = \varnothing\) y el sistema es incompatible.</li>
+        <li>Si \(b \in \operatorname{Im}(f)\), el sistema es compatible:
+          <ul>
+            <li>Si \(\ker(f) = \{0\}\), la solución es única (compatible determinado).</li>
+            <li>Si \(\ker(f) \neq \{0\}\), hay infinitas soluciones (compatible indeterminado).</li>
+          </ul>
+        </li>
+      </ul>
+
+      <p class="math-block">
+        \[
+        \dim(\operatorname{Im}(f)) = \operatorname{rang}(A),\qquad
+        \dim(\ker(f)) = n - \operatorname{rang}(A).
+        \]
+      </p>
+      <p>
+        Un sistema homogéneo siempre es compatible, ya que \(0 \in \operatorname{Im}(f)\).
+      </p>
+    </section>
+
+    <!-- MATRICES, RANGO -->
+    <section id="matrices" class="tab-content">
+      <h3>Matrices escalonadas, rango y regularidad</h3>
+
+      <h4>Pivote</h4>
+      <p>
+        Sea \(A \in \mathbb{M}_{n \times m}\). Se llama <strong>pivote</strong> de una fila de \(A\) al primer elemento no nulo
+        de dicha fila.
+      </p>
+
+      <h4>Matrices escalonadas</h4>
+      <p>
+        Diremos que \(A \in \mathbb{M}_{n \times m}\) es una matriz escalonada por filas si:
+      </p>
+      <ol>
+        <li>Las filas nulas, si existen, están agrupadas en la parte inferior.</li>
+        <li>El pivote de cada fila no nula está a la derecha del pivote de la fila inmediatamente superior.</li>
+      </ol>
+
+      <p>
+        Equivalentemente, existen \(r \le n\) filas no nulas tales que:
+      </p>
+      <ol>
+        <li>\(A_i \neq 0\) para \(1 \le i \le r\) y \(A_i = 0\) para todo \(i > r\).</li>
+        <li>\(p_1 < p_2 < \cdots < p_r\), donde \(p_i\) es la posición del pivote de la fila \(i\).</li>
+      </ol>
+
+      <p class="math-block">
+        \[
+        \begin{pmatrix}
+        1 & 2 & 3 & 4 \\
+        0 & 1 & 2 & 3 \\
+        0 & 0 & 1 & 2 \\
+        0 & 0 & 0 & 0
+        \end{pmatrix}
+        \]
+      </p>
+      <p>
+        es un ejemplo de matriz escalonada por filas.
+      </p>
+
+      <h4>Matriz regular</h4>
+      <p>
+        Sea \(A \in \mathbb{M}_n(\mathbb{R})\) cuadrada. Diremos que \(A\) es <strong>regular</strong> si existe
+        \(B \in \mathbb{M}_n(\mathbb{R})\) tal que
+        \[
+        AB = BA = I_n.
+        \]
+        En tal caso, \(B\) se llama inversa de \(A\).
+      </p>
+
+      <div class="boxed">
+        <h4>Definición de rango</h4>
+        <p>
+          Sean \(A, B \in \mathbb{M}_{n \times m}\) tales que \(A \sim_r B\) y \(B\) es escalonada. Se llama
+          <strong>rango</strong> de \(A\), y se denota \(\operatorname{rg} A\), al número de filas no nulas de \(B\).
+        </p>
+      </div>
+
+      <p>
+        El rango de una matriz es independiente de la matriz escalonada elegida y es invariante por equivalencia
+        por filas. También coincide con el máximo orden de las submatrices cuadradas regulares de \(A\).
+      </p>
+    </section>
+
+    <!-- SISTEMAS TRIANGULARES Y GAUSS -->
+    <section id="triangulares" class="tab-content">
+      <h3>Resolución de sistemas triangulares y método de Gauss</h3>
+
+      <h4>Sistemas triangulares superiores</h4>
+      <p>
+        Un sistema cuya matriz de coeficientes es triangular superior se puede resolver por sustitución regresiva.
+        Sea \(A\) una matriz cuadrada con \(a_{i,j} = 0\) para \(i > j\) y \(b = (b_1,\dots,b_n)^T\). El sistema
+        \(A x = b\) se escribe:
+      </p>
+
+      <p class="math-block">
+        \[
+        \begin{cases}
+        a_{1,1} x_1 + a_{1,2} x_2 + \cdots + a_{1,n} x_n = b_1 \\
+        a_{2,2} x_2 + \cdots + a_{2,n} x_n = b_2 \\
+        \vdots \\
+        a_{n-1,n-1} x_{n-1} + a_{n-1,n} x_n = b_{n-1} \\
+        a_{n,n} x_n = b_n
+        \end{cases}
+        \]
+      </p>
+
+      <p>
+        Si \(a_{i,i} \neq 0\) para todo \(i\), la solución es única. Se despeja primero
+        \[
+        x_n = \dfrac{b_n}{a_{n,n}},
+        \]
+        luego \(x_{n-1}\), y así sucesivamente hasta \(x_1\).
+      </p>
+
+      <p class="math-block">
+        \[
+        x_{n-1} = \dfrac{b_{n-1} - a_{n-1,n} x_n}{a_{n-1,n-1}},
+        \]
+        \[
+        x_1 = \frac{1}{a_{1,1}}\Bigl(b_1 - \sum_{j=2}^{n} a_{1,j} x_j\Bigr).
+        \]
+      </p>
+
+      <p>
+        De forma análoga, un sistema triangular inferior se resuelve por sustitución progresiva.
+      </p>
+
+      <h4>Propiedades elementales</h4>
+      <ul>
+        <li>
+          Si \(s\) es solución de una ecuación \(e_i\), entonces también lo es de \(k e_i\) con
+          \(k \in \mathbb{R}^* = \mathbb{R} \setminus \{0\}\).
+        </li>
+        <li>
+          Si \(s\) es solución de \(e_i\) y \(e_j\), entonces lo es de \(e_i + e_j\).
+        </li>
+        <li>
+          El orden de las ecuaciones del sistema no afecta a su conjunto de soluciones.
+        </li>
+      </ul>
+
+      <h4>Método de Gauss</h4>
+      <p>
+        El método de Gauss consiste en aplicar sistemáticamente estas transformaciones elementales a la matriz
+        ampliada del sistema para obtener un sistema equivalente con matriz triangular (o escalonada) cuya
+        resolución sea directa.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
+    <script  src="./script.js"></script>
+
+  </body>
+  
+</html>
