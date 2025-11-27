@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polinomios - Ejercicio 3</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+          --color-primary: #008080;
+          --color-bg: #FDFBD4;
+          --color-accent: #05472A;
+          --color-yellow: #fff8a6;
+          --color-text: #222222;
+        }
+
+        body {
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          background-color: var(--color-bg);
+          color: var(--color-text);
+          line-height: 1.7;
+          padding: 1.5rem 1rem;
+          font-size: 1.24rem;
+          max-width: 1500px;
+          margin: 0 auto;
+        }
+
+        .math-block {
+          font-size: 1.19em;
+        }
+
+        .main-header {
+          border-radius: 0.75rem;
+          background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+          color: white;
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+          text-align: center;
+          box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+        }
+
+        .main-header h1 {
+          font-size: 2.1rem;
+          letter-spacing: 0.09em;
+          margin-bottom: 0.5rem;
+        }
+
+        .main-header h2 {
+          font-size: 1.06rem;
+          font-weight: 400;
+        }
+
+        /* Tabs, Content, Boxes */
+        .tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .tab-button {
+          border: none; padding: 0.7rem 1.2rem; border-radius: 999px;
+          background-color: white; color: var(--color-primary); font-weight: 600;
+          font-size: 1.08em; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+          transition: background-color 0.2s, color 0.2s, transform 0.1s;
+        }
+        .tab-button.active { background-color: var(--color-primary); color: white; }
+        .tab-button:hover { transform: translateY(-1px); }
+
+        main { max-width: 1500px; margin: 0 auto; }
+        .tab-content {
+          display: none;
+          background-color: rgb(255 255 255 / 0.92);
+          border-radius: 0.85rem;
+          padding: 1.82rem;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.09);
+          margin-bottom: 1.7rem;
+          font-size: 1.10em;
+        }
+        .tab-content.active { display: block; }
+
+        .tab-content h3 {
+          color: var(--color-accent);
+          margin-bottom: 1.02rem;
+          border-bottom: 2px solid rgba(0,128,128,0.18);
+          padding-bottom: 0.35rem;
+          font-size: 1.27em;
+        }
+
+        .tab-content h4 { margin-top: 1.17rem; margin-bottom: 0.61rem; color: var(--color-primary);}
+        .tab-content h5 { margin-top: 0.22rem; margin-bottom: 0.35rem; color: var(--color-accent); font-size:1.06em;}
+
+        p { margin-bottom: 0.67rem; }
+
+        ul, ol { margin-left: 1.32rem; margin-bottom: 1.08rem; }
+
+        /* Boxes, Highlighted */
+        .boxed {
+          border-left: 4px solid var(--color-primary);
+          background: rgba(0,128,128,0.05);
+          padding: 1.10rem 1.12rem;
+          margin: 1.01rem 0;
+          border-radius: 0.5rem;
+          font-size:1.01em;
+        }
+        .highlight-strong {
+          border-left-color: var(--color-accent);
+          background: rgba(5, 71, 42, 0.11);
+        }
+
+        /* Button y pasos demostración */
+        .step-button {
+          display: inline-block;
+          margin: 0.8rem 0 1.02rem;
+          padding: 0.67rem 1.08rem;
+          border-radius: 999px;
+          border: none;
+          background-color: var(--color-accent);
+          color: white;
+          font-weight: 600;
+          font-size: 1.07em;
+          cursor: pointer;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.14);
+          transition: background-color 0.2s, transform 0.1s;
+        }
+        .step-button:hover {
+          background-color: #07613a;
+          transform: translateY(-1px);
+        }
+
+        /* Pasos de la demostración: mantienen visible todos, pero cada .visible se resalta */
+        .step-container {
+          border-radius: 0.72rem;
+          background-color: rgb(255 255 255 / 0.97);
+          border: 1px solid rgba(0,0,0,0.07);
+          padding: 0.96rem 1rem;
+        }
+        .step {
+          padding: 0.82rem 1.09rem;
+          border-radius: 0.65rem;
+          margin-bottom: 0.58rem;
+          background: none;
+          transition: background 0.15s;
+        }
+        .step.visible {
+          background-color: var(--color-yellow);
+          box-shadow: 0 0 0 1px rgba(255,209,26,0.23);
+        }
+
+        /* Imagen Tipos de sistemas */
+        img[src="1.png"] {
+          border-radius:8px;
+          box-shadow:0 2px 6px rgba(0,0,0,0.09);
+          margin:1.1rem 0 1.05rem 0;
+          max-width:95%;
+        }
+
+        /* MathJax: mayor tamaño */
+        .mjx-container { font-size: 1.18em !important; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+          body { padding: 0.6rem; font-size: 1.07rem;}
+          .main-header { padding: 1rem; }
+          .main-header h1 { font-size: 1.23rem; }
+          .main-header h2 { font-size: 0.93rem; }
+          .tab-content { padding: 1rem;}
+          img[src="1.png"] { max-width:99%; }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <h1>POLINOMIOS</h1>
+        <h2>Ejercicio 3 - Ecuación cuártica</h2>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="enunciado">Enunciado</button>
+            <button class="tab-button" data-tab="cambio-variable">Cambio de variable</button>
+            <button class="tab-button" data-tab="solucion-a">Solución (a)</button>
+            <button class="tab-button" data-tab="solucion-b">Solución (b)</button>
+        </div>
+
+        <section id="enunciado" class="tab-content active">
+            <h3>EJERCICIO 3</h3>
+            <p>Dada la ecuación \(x^4 + 4x^3 - 2x^2 - 12x + k = 0\), con \(k \in \mathbb{R}\), se pide:</p>
+            <ol>
+                <li>Discutir las soluciones en función de \(k\).</li>
+                <li>Resolver la ecuación para \(k = -27\).</li>
+            </ol>
+        </section>
+
+        <section id="cambio-variable" class="tab-content">
+            <h3>Idea del cambio de variable</h3>
+            <p>Una ecuación cuártica general tiene la forma:</p>
+            <div class="math-block">\[x^4 + ax^3 + bx^2 + cx + d = 0.\]</div>
+            <p>Mediante el cambio de variable:</p>
+            <div class="math-block">\[x = y - \dfrac{a}{4},\]</div>
+            <p>se puede eliminar el término cúbico y transformar la ecuación en una <em>cuártica deprimida</em>, sin término en \(y^3\). En efecto, al desarrollar y reagrupar términos, los coeficientes de \(y^3\) que aparecen se cancelan entre sí.</p>
+            <p>En nuestro caso, el coeficiente del término cúbico es \(a = 4\), luego tomamos:</p>
+            <div class="math-block">\[x = y - \dfrac{4}{4} = y - 1,\]</div>
+            <p>que es precisamente el cambio que se utiliza a continuación. Al sustituir \(x = y - 1\) en la ecuación original y desarrollar, los términos en \(y^3\) se anulan, quedando una ecuación solo con potencias pares de \(y\).</p>
+        </section>
+
+        <section id="solucion-a" class="tab-content">
+            <h3>Solución del apartado (a)</h3>
+            <p>Haciendo el cambio \(x = y - 1\), con el objetivo de eliminar el término en \(x^3\), se tiene:</p>
+            <div class="math-block">\[(y - 1)^4 + 4(y - 1)^3 - 2(y - 1)^2 - 12(y - 1) + k = y^4 - 8y^2 + 7 + k = 0,\]</div>
+            <p>que es una ecuación bicuadrada y, por tanto, se puede escribir como:</p>
+            <div class="math-block">\[y^2 = 4 \pm \sqrt{9 - k}.\]</div>
+            <p>Dependiendo de los valores de \(k\), se obtienen las siguientes soluciones:</p>
+            <ul>
+                <li>Si \(k > 9\), entonces \(9 - k < 0\) y las cuatro raíces son complejas.</li>
+                <li>Si \(k = 9\), entonces \(y = 2\) es doble e \(y = -2\) también doble. Las soluciones pedidas son \(x = \pm 1\) dobles.</li>
+                <li>Si \(-7 < k < 9\), entonces \(0 < \sqrt{9 - k} < 4\); en consecuencia, las cuatro soluciones son reales y distintas.</li>
+                <li>Si \(k = -7\), entonces \(\sqrt{9 - k} = 4\) y las soluciones son \(x = \pm\sqrt{8} - 1\) y \(x = -1\) dobles.</li>
+                <li>Si \(k < -7\), entonces existen dos soluciones reales y distintas y dos soluciones complejas.</li>
+            </ul>
+        </section>
+
+        <section id="solucion-b" class="tab-content">
+            <h3>Solución del apartado (b)</h3>
+            <p>Si \(k = -27\), entonces:</p>
+            <div class="math-block">\[y^2 = 4 \pm 6 \quad \Rightarrow \quad y^2 = 10 \ \text{o} \ y^2 = -2 \quad \Rightarrow \quad y = \pm\sqrt{10}, \ y = \pm\sqrt{2}\,i.\]</div>
+            <p>Finalmente, como \(x = y - 1\), las soluciones de la ecuación original son:</p>
+            <div class="math-block">\[x = -1 \pm \sqrt{10}, \qquad x = -1 \pm \sqrt{2}\,i.\]</div>
+        </section>
+    </main>
+
+    <script>
+        // Gestión de pestañas
+        document.addEventListener("DOMContentLoaded", function () {
+          const tabButtons = document.querySelectorAll(".tab-button");
+          const tabContents = document.querySelectorAll(".tab-content");
+
+          tabButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const targetId = btn.getAttribute("data-tab");
+              tabButtons.forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              tabContents.forEach((sec) => {
+                if (sec.id === targetId) sec.classList.add("active");
+                else sec.classList.remove("active");
+              });
+              if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise();
+            });
+          });
+
+          // Configuración de MathJax
+          window.MathJax = {
+            tex: {
+              inlineMath: [['$', '$'], ['\\(', '\\)']],
+              displayMath: [['$$', '$$'], ['\\[', '\\]']],
+              processEscapes: true,
+              processEnvironments: true
+            },
+            options: {
+              skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+          };
+        });
+    </script>
+</body>
+</html>
