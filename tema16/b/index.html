@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>tema 16 b</title>
+    <link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Método de eliminación de Gauss - Ejemplos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [["\\(", "\\)"]],
+        displayMath: [["\\[", "\\]"]],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="main-header">
+    <h1>Método de eliminación de Gauss</h1>
+    <h2>Sistemas de ecuaciones lineales</h2>
+  </header>
+  <nav class="tabs">
+    <button class="tab-button active" data-tab="gauss">Gauss</button>
+    <button class="tab-button" data-tab="ejemplo1">Ejemplo 1</button>
+    <button class="tab-button" data-tab="ejemplo2">Ejemplo 2</button>
+  </nav>
+  <main>
+    <!-- Método Gauss -->
+    <section id="gauss" class="tab-content active">
+      <div class="boxed"><h3>Método de eliminación de Gauss</h3></div>
+      <p>Consiste en usar operaciones elementales en las ecuaciones para transformar el sistema de ecuaciones lineales \(n \times n\) en un sistema reducido de forma triangular.</p>
+      <p>Consideremos un sistema \(Ax = b\) de orden \(n\):</p>
+      <p class="math-block">
+        \[
+        A = \begin{pmatrix}
+        a_{1,1} & a_{1,2} & \cdots & a_{1,n} \\
+        a_{2,1} & a_{2,2} & \cdots & a_{2,n} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{n,1} & a_{n,2} & \cdots & a_{n,n}
+        \end{pmatrix}, \quad
+        x = \begin{pmatrix}
+        x_1 \\
+        x_2 \\
+        \vdots \\
+        x_n
+        \end{pmatrix}, \quad
+        b = \begin{pmatrix}
+        b_1 \\
+        b_2 \\
+        \vdots \\
+        b_n
+        \end{pmatrix}
+        \]
+      </p>
+      <p>Definimos \(A^{(0)} = A\) y \(b^{(0)} = b\) y suponemos que \(a_{1,1}^{(0)} = a_{1,1} \neq 0\). Se elimina la variable \(x_1\) desde la segunda ecuación hasta la \(n\)-ésima: para cada \(i = 2, \ldots, n\), se resta la primera ecuación multiplicada por</p>
+      <p class="math-block">\[
+      l_{i,1} =\frac{a_{i,1}}{a_{1,1}}= \frac{a_{i,1}^{(0)}}{a_{1,1}^{(0)}}
+      \]</p>
+      <p> a la \(i\)-ésima ecuación, obteniéndose un nuevo sistema \(A^{(1)}x = b^{(1)}\), donde</p>
+      <p class="math-block">\[
+      A^{(1)} = \begin{pmatrix}
+      a_{1,1}^{(1)} & a_{1,2}^{(1)} & \cdots & a_{1,n}^{(1)} \\
+      0 & a_{2,2}^{(1)} & \cdots & a_{2,n}^{(1)} \\
+      \vdots & \vdots & \ddots & \vdots \\
+      0 & a_{n,2}^{(1)} & \cdots & a_{n,n}^{(1)}
+      \end{pmatrix}
+      \]</p>
+      <p>donde</p>
+      <p class="math-block">\[
+      b^{(1)} = \begin{pmatrix}
+      b_1^{(1)} \\
+      b_2^{(1)} \\
+      \vdots \\
+      b_n^{(1)}
+      \end{pmatrix}
+      \]</p>
+      <p>
+      <span class="math-block">\[
+      \begin{cases}
+        a_{1,j}^{(1)} = a_{1,j}^{(0)} = a_{ij}, & 1 \leq j \leq n, \\
+        a_{i,j}^{(1)} = a_{i,j}^{(0)} - l_{i,1} a_{1,j}^{(0)}, & 2 \leq i \leq n, \ 1 \leq j \leq n, \\
+        b_1^{(1)} = b_1^{(0)}; \quad b_i^{(1)} = b_i^{(0)} - l_{i,1} b_1^{(0)}, & 2 \leq i \leq n.
+      \end{cases}
+      \]</span>
+      </p>
+      <p>Paso \(k+1\). Supongamos que hemos llegado a</p>
+      <p class="math-block">\[
+      A^{(k)} x = b^{(k)},
+      \]</p>
+      <p>con</p>
+      <p class="math-block">\[
+      A^{(k)} = \begin{pmatrix}
+      a_{1,1}^{(k)} & a_{1,2}^{(k)} & \cdots & a_{1,k}^{(k)}  & \cdots & a_{1,n}^{(k)} \\
+      0 & \cdots & a_{k-1,k-1}^{(k)} & a_{k-1,k}^{(k)} & \cdots & a_{k-1,n}^{(k)} \\
+      \vdots & \vdots & \ddots & \vdots & \vdots & \vdots \\
+      0 & \cdots & 0 & a_{k,k}^{(k)} & \cdots & a_{k,n}^{(k)} \\
+      \vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+      0 & \cdots & 0 & a_{n,k}^{(k)} & \cdots & a_{n,n}^{(k)}
+      \end{pmatrix}
+      \]</p>
+      <p>y que, además, \( a_{k,k}^{(k)} \neq 0 \).</p>
+      <p>
+        Se determinan \( A^{(k+1)} \) y \( b^{(k+1)} \) por
+        <span class="math-block">\[
+          a_{i,j}^{(k+1)} =
+          \begin{cases}
+          a_{i,j}^{(k)} & \text{si } i \leq k, \\
+          a_{i,j}^{(k)}  - l_{i,k} a_{i,k}^{(k)}, & \text{si } i \geq k, j \geq k + 1\\
+          0  & \text{si } i \geq k + 1, j \leq k,
+          \end{cases}
+          \ \ b_i^{(k+1)}=
+          \begin{cases}
+          b_i^{(k)}  & \text{si } i \leq k, \\
+          b_i^{(k)} - l_{i,k} b_k^{(k)}, & \text{si } i \geq k + 1.
+          \end{cases}
+        \]
+        </span>
+      </p>
+      <p>Si el proceso puede ser completado, es decir, si todos los pivotes son no nulos, entonces la matriz final será triangular superior y se resuelve por sustitución regresiva.</p>
+      <div class="boxed highlight-strong">
+        <b>Resultado</b><br>
+        Puede completarse Gauss sin divisores nulos si, y solo si, los menores principales
+        <span class="math-block">\[
+          \begin{pmatrix}
+          a_{1,1} & \cdots & a_{1,k} \\
+          \vdots & \ddots & \vdots \\
+          a_{k,1} & \cdots & a_{k,k}
+          \end{pmatrix}
+          \quad 1 \leq k \leq n
+        \]</span>
+        son invertibles.
+      </div>
+      <h4>Observaciones</h4>
+      <ul>
+        <li>El número de operaciones para Gauss es \(16n^3 + 9n^2 - 7n\), frente a \((n+1)!n-1\) de Cramer.</li>
+        <li>Si algún pivote es nulo, no se puede continuar.</li>
+        <li>Si un pivote es muy pequeño, puede aparecer error numérico.</li>
+      </ul>
+      <h4>Casos m × n</h4>
+      <ul>
+        <li>El proceso sirve también para sistemas \(m \times n\), obteniendo familias de soluciones.</li>
+      </ul>
+      <p class="math-block">\[
+        \begin{cases}
+          a_{1,1}^{(1)} x_1 + a_{1,2}^{(1)}  x_2 + \cdots + a_{1,n-1}^{(1)}  x_{n-1} + a_{1,n}^{(1)}  x_n &= b_1 ^{(1)} \\
+          a_{2,2}^{(2)}  x_2 + \cdots + a_{2,n-1}^{(2)}  x_{n-1} + a_{2,n}^{(2)}  x_n &= b_2^{(2)}  \\
+          \vdots \\
+          a_{m,m}^{(m)}  x_{m} + a_{m,m+1}^{(m)} x_{m+1}+ \cdots +	a_{m,n}^{(m)} x_{n}  &= b_{n} ^{(m)}
+        \end{cases}
+        \]
+      </p>
+    </section>
+    <!-- Ejemplo 1 -->
+    <section id="ejemplo1" class="tab-content">
+      <div class="boxed"><h3>Ejemplo 1</h3></div>
+      <p>Discutamos y resolvamos, en su caso, el sistema de ecuaciones lineales</p>
+      <p class="math-block">\[
+      \begin{cases}
+      x_1 - x_2 + x_3 = 1 \\
+      3x_2 - 4x_3 = -1 \\
+      x_1 + 2x_2 - 3x_3 = 0
+      \end{cases}
+      \]</p>
+      <p>Consideramos la matriz ampliada asociada y la transformamos progresivamente:</p>
+      <p class="math-block">\[
+      \left(
+      \begin{array}{ccc|c}
+      1 & -1 & 1 & 1 \\
+      0 & 3 & -4 & -1 \\
+      1 & 2 & -3 & 0
+      \end{array}
+      \right)
+      \xrightarrow{\substack{F_3 - F_1 \\ F_3 - F_2}}
+      \left(
+      \begin{array}{ccc|c}
+      1 & -1 & 1 & 1 \\
+      0 & 3 & -4 & -1 \\
+      0 & 3 & -4 & -1
+      \end{array}
+      \right)
+      \xrightarrow{\substack{F_4 - 2F_1 \\ F_4 - F_2}}
+      \left(
+      \begin{array}{ccc|c}
+      1 & -1 & 1 & 1 \\
+      0 & 3 & -4 & -1 \\
+      0 & 0 & 0 & 0
+      \end{array}
+      \right)
+      \]</p>
+      <p class="math-block">\[
+      \left(
+      \begin{array}{ccc|c}
+      1 & -1 & 1 & 1 \\
+      0 & 3 & -4 & -1 \\
+      0 & 0 & 0 & 0
+      \end{array}
+      \right)
+      \xrightarrow{\substack{1 + 3F_2 \\ \frac{1}{3} F_2}}
+      \left(
+      \begin{array}{ccc|c}
+      1 & -1 & 1 & 1 \\
+      0 & 1 & -\frac{4}{3} & -\frac{1}{3} \\
+      0 & 0 & 0 & 0
+      \end{array}
+      \right)
+      \]</p>
+      <p>El sistema equivalente es:</p>
+      <p class="math-block">\[
+      \begin{cases}
+      x_1 - x_2 + x_3 = 1 \\
+      x_2 - \frac{4}{3}x_3 = -\frac{1}{3}
+      \end{cases}
+      \]</p>
+      <p>Solución general:</p>
+      <p class="math-block">\[
+      \begin{pmatrix}
+      x_1 \\
+      x_2 \\
+      x_3
+      \end{pmatrix} = \begin{pmatrix}
+      4\lambda + 1 \\
+      -1 - \frac{4}{3}\lambda \\
+      \lambda
+      \end{pmatrix}, \quad \forall \lambda \in \mathbb{R}.
+      \]</p>
+    </section>
+    <!-- Ejemplo 2 -->
+    <section id="ejemplo2" class="tab-content">
+      <div class="boxed"><h3>Ejemplo 2 (Gauss-Jordan)</h3></div>
+      <p>Discutamos y resolvamos, por el método de Gauss-Jordan, el sistema</p>
+      <p class="math-block">\[
+      \begin{cases}
+      2x_1 - x_2 + x_3 = 2 \\
+      3x_2 - 4x_3 = -1 \\
+      x_1 - 3x_2 = -2 \\
+      x_1 - x_2 + x_3 = 1
+      \end{cases}
+      \]</p>
+      <p>Transformamos la matriz ampliada en una escalonada equivalente:</p>
+      <p class="math-block">\[
+      \left(
+      \begin{array}{ccc|c}
+      2 & -1 & 1 & 2 \\
+      0 & 3 & -4 & -1 \\
+      1 & -3 & 0 & -2 \\
+      1 & -1 & 1 & 1
+      \end{array}
+      \right)
+      \xrightarrow{\substack{F_3 - F_1 \\ F_1 \leftrightarrow F_4 \\ F_4 - 2F_1}}
+      \left(
+      \begin{array}{ccc|c}
+      1 & -1 & 1 & 1 \\
+      0 & 3 & -4 & -1 \\
+      0 & 0 & -3 & -3 \\
+      0 & 1 & -1 & 0
+      \end{array}
+      \right)
+      \]</p>
+      <p class="math-block">\[
+      \left(
+      \begin{array}{ccc|c}
+      1 & 0 & 0 & 1 \\
+      0 & 1 & 0 & 1 \\
+      0 & 0 & 1 & 1 \\
+      0 & 0 & 0 & 0
+      \end{array}
+      \right)
+      \]</p>
+      <p>Solución:</p>
+      <p class="math-block">\[
+      \begin{pmatrix}
+      x_1 \\
+      x_2 \\
+      x_3
+      \end{pmatrix} = \begin{pmatrix}
+      1 \\
+      1 \\
+      1
+      \end{pmatrix}
+      \]</p>
+    </section>
+  </main>
+</body>
+</html>
+    <script  src="./script.js"></script>
+
+  </body>
+  
+</html>
