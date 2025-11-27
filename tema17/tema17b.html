@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teorema Fundamental de la Programación Lineal</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+          --color-primary: #008080;
+          --color-bg: #FDFBD4;
+          --color-accent: #05472A;
+          --color-yellow: #fff8a6;
+          --color-text: #222222;
+        }
+
+        body {
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          background-color: var(--color-bg);
+          color: var(--color-text);
+          line-height: 1.7;
+          padding: 1.5rem 1rem;
+          font-size: 1.24rem;
+          max-width: 1500px;
+          margin: 0 auto;
+        }
+
+        .math-block {
+          font-size: 1.19em;
+        }
+
+        .main-header {
+          border-radius: 0.75rem;
+          background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+          color: white;
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+          text-align: center;
+          box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+        }
+
+        .main-header h1 {
+          font-size: 2.1rem;
+          letter-spacing: 0.09em;
+          margin-bottom: 0.5rem;
+        }
+
+        .main-header h2 {
+          font-size: 1.06rem;
+          font-weight: 400;
+        }
+
+        /* Tabs, Content, Boxes */
+        .tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .tab-button {
+          border: none; padding: 0.7rem 1.2rem; border-radius: 999px;
+          background-color: white; color: var(--color-primary); font-weight: 600;
+          font-size: 1.08em; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+          transition: background-color 0.2s, color 0.2s, transform 0.1s;
+        }
+        .tab-button.active { background-color: var(--color-primary); color: white; }
+        .tab-button:hover { transform: translateY(-1px); }
+
+        main { max-width: 1500px; margin: 0 auto; }
+        .tab-content {
+          display: none;
+          background-color: rgb(255 255 255 / 0.92);
+          border-radius: 0.85rem;
+          padding: 1.82rem;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.09);
+          margin-bottom: 1.7rem;
+          font-size: 1.10em;
+        }
+        .tab-content.active { display: block; }
+
+        .tab-content h3 {
+          color: var(--color-accent);
+          margin-bottom: 1.02rem;
+          border-bottom: 2px solid rgba(0,128,128,0.18);
+          padding-bottom: 0.35rem;
+          font-size: 1.27em;
+        }
+
+        .tab-content h4 { margin-top: 1.17rem; margin-bottom: 0.61rem; color: var(--color-primary);}
+        .tab-content h5 { margin-top: 0.22rem; margin-bottom: 0.35rem; color: var(--color-accent); font-size:1.06em;}
+
+        p { margin-bottom: 0.67rem; }
+
+        ul, ol { margin-left: 1.32rem; margin-bottom: 1.08rem; }
+
+        /* Boxes, Highlighted */
+        .boxed {
+          border-left: 4px solid var(--color-primary);
+          background: rgba(0,128,128,0.05);
+          padding: 1.10rem 1.12rem;
+          margin: 1.01rem 0;
+          border-radius: 0.5rem;
+          font-size:1.01em;
+        }
+        .highlight-strong {
+          border-left-color: var(--color-accent);
+          background: rgba(5, 71, 42, 0.11);
+        }
+
+        /* Button y pasos demostración */
+        .step-button {
+          display: inline-block;
+          margin: 0.8rem 0 1.02rem;
+          padding: 0.67rem 1.08rem;
+          border-radius: 999px;
+          border: none;
+          background-color: var(--color-accent);
+          color: white;
+          font-weight: 600;
+          font-size: 1.07em;
+          cursor: pointer;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.14);
+          transition: background-color 0.2s, transform 0.1s;
+        }
+        .step-button:hover {
+          background-color: #07613a;
+          transform: translateY(-1px);
+        }
+
+        /* Pasos de la demostración: mantienen visible todos, pero cada .visible se resalta */
+        .step-container {
+          border-radius: 0.72rem;
+          background-color: rgb(255 255 255 / 0.97);
+          border: 1px solid rgba(0,0,0,0.07);
+          padding: 0.96rem 1rem;
+        }
+        .step {
+          padding: 0.82rem 1.09rem;
+          border-radius: 0.65rem;
+          margin-bottom: 0.58rem;
+          background: none;
+          transition: background 0.15s;
+        }
+        .step.visible {
+          background-color: var(--color-yellow);
+          box-shadow: 0 0 0 1px rgba(255,209,26,0.23);
+        }
+
+        /* Subpestañas */
+        .sub-tabs { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 0.3rem; 
+            margin: 1.5rem 0 1rem; 
+        }
+        .sub-tab-button {
+            border: none; 
+            padding: 0.5rem 1rem; 
+            border-radius: 6px;
+            background-color: rgba(0,128,128,0.1); 
+            color: var(--color-primary); 
+            font-weight: 500;
+            font-size: 0.95em; 
+            cursor: pointer; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: background-color 0.2s, color 0.2s, transform 0.1s;
+        }
+        .sub-tab-button.active { 
+            background-color: var(--color-primary); 
+            color: white; 
+        }
+        .sub-tab-button:hover { 
+            transform: translateY(-1px); 
+        }
+
+        .sub-tab-content {
+            display: none;
+            padding: 1rem 0;
+        }
+        .sub-tab-content.active { 
+            display: block; 
+        }
+
+        /* Columnas para el ejemplo */
+        .columns-container {
+            display: flex;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+        .column {
+            flex: 1;
+        }
+        
+        /* Representación gráfica */
+        .graph-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 1rem 0;
+            text-align: center;
+        }
+        .graph-placeholder {
+            width: 100%;
+            height: 300px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem 0;
+            border: 1px dashed #ccc;
+        }
+        
+        /* MathJax: mayor tamaño */
+        .mjx-container { font-size: 1.18em !important; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+          body { padding: 0.6rem; font-size: 1.07rem;}
+          .main-header { padding: 1rem; }
+          .main-header h1 { font-size: 1.23rem; }
+          .main-header h2 { font-size: 0.93rem; }
+          .tab-content { padding: 1rem;}
+          .columns-container {
+              flex-direction: column;
+          }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <h1>TEOREMA FUNDAMENTAL DE LA PROGRAMACIÓN LINEAL</h1>
+        <h2>Método Gráfico y Aplicaciones</h2>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="teorema-fundamental">Teorema Fundamental</button>
+            <button class="tab-button" data-tab="metodo-grafico">Método Gráfico</button>
+            <button class="tab-button" data-tab="ejemplo">Ejemplo Práctico</button>
+        </div>
+
+        <!-- CONTENIDO DEL TEOREMA FUNDAMENTAL -->
+        <section id="teorema-fundamental" class="tab-content active">
+            <h3>Teorema Fundamental de la Programación Lineal</h3>
+            
+            <div class="boxed highlight-strong">
+                <ol>
+                    <li>Si un problema de Programación Lineal tiene solución óptima, dicha solución se alcanza en un punto extremo (vértice) de la región factible que, como sabemos es un conjunto convexo.</li>
+                    <li>Si dos vértices son óptimos para la función objetivo, entonces lo es toda combinación lineal convexa de estos.</li>
+                </ol>
+            </div>
+            
+            <h4>Demostración</h4>
+            <p>Sea \( f(x) = c^Tx \) la función objetivo y \( F \) la región factible del problema. Sin pérdida de generalidad, supondremos que el problema está expresado en términos de maximizar.</p>
+            
+            <button id="btn-demostracion" class="step-button">Resaltar siguiente paso</button>
+            
+            <div id="demostracion-steps" class="step-container">
+                <div class="step">
+                    <h5>Parte (a)</h5>
+                    <p>Sean \( x_1, \ldots, x_k \) los vértices de \( F \) y sea \( x_0 \) un punto no extremo y solución posible; por no ser extremo se tiene que:</p>
+                    
+                    \[ x_0 = \sum_{i=1}^{k} \lambda_i x_i \]
+                    
+                    <p>con</p>
+                    
+                    \[ \sum_{i=1}^{k} \lambda_i = 1, \quad \lambda_i \geqslant 0, \quad i = 1, \ldots, k. \]
+                    
+                    <p>La función objetivo en \( x_0 \) es \( f(x_0) = c^Tx_0 \), entonces:</p>
+                    
+                    \[ f(x_0) = c^T \left( \sum_{i=1}^{k} \lambda_i x_i \right) = \sum_{i=1}^{k} \lambda_i c^T x_i = \sum_{i=1}^{k} \lambda_i f(x_i). \]
+                </div>
+                
+                <div class="step">
+                    <p>Sea \( z^* = \max\{f(x_i), i = 1, \ldots, k\} \), entonces:</p>
+                    
+                    \[ f(x_0) \leqslant \sum_{i=1}^{k} \lambda_i z^* = z^* \]
+                    
+                    <p>Por tanto, \( x_0 \) no es un punto máximo de la función objetivo y el máximo se ha de alcanzar en los extremos.</p>
+                </div>
+                
+                <div class="step">
+                    <h5>Parte (b)</h5>
+                    <p>Sean \( x_1, x_2 \) dos extremos donde se alcanza el máximo de la función objetivo, es decir, \( f(x_1) = f(x_2) = z^* \), y sean \( \lambda_1, \lambda_2 \geqslant 0 \), con \( \lambda_1 + \lambda_2 = 1 \).</p>
+                    
+                    <p>Por ser \( f \) lineal, se tiene:</p>
+                    
+                    \[ f(\lambda_1 x_1 + \lambda_2 x_2) = \lambda_1 f(x_1) + \lambda_2 f(x_2) = \lambda_1 z^* + \lambda_2 z^* = (\lambda_1 + \lambda_2)z^* = z^*, \]
+                    
+                    <p>lo cual demuestra la segunda parte.</p>
+                </div>
+            </div>
+            
+            <div class="boxed">
+                <p>Teniendo en cuenta estos resultados, podemos establecer el siguiente método gráfico para la resolución de problemas de Programación Lineal.</p>
+            </div>
+        </section>
+
+        <!-- CONTENIDO DEL MÉTODO GRÁFICO -->
+        <section id="metodo-grafico" class="tab-content">
+            <h3>Método Gráfico</h3>
+            
+            <p>Es un método muy utilizado sobre todo cuando el problema tiene dos variables. Consiste en representar en un sistema de coordenadas todas las restricciones, también las de no negatividad, formando la región de soluciones factibles. Como hemos visto en la sección anterior, esta región es siempre un poliedro convexo y el óptimo de la función objetivo, si existe, se alcanza en un punto extremo (vértice) de la misma.</p>
+            
+            <p>Para encontrar de forma gráfica la solución de un problema de Programación Lineal cuando contamos con dos variables, se expone la regla de los 5 pasos:</p>
+            
+            <div class="boxed">
+                <ol>
+                    <li><strong>Paso 1:</strong> Representar todas las restricciones del problema para determinar la región factible \( F \). Si ésta es vacía, el problema no tiene solución óptima, se dice que es infactible; de lo contrario, ir al siguiente paso (Paso 2).</li>
+                    
+                    <li><strong>Paso 2:</strong> Identificar los extremos o vértices de \( F \).</li>
+                    
+                    <li><strong>Paso 3:</strong> Dibujar una de las rectas que pertenezca a la familia de rectas paralelas que representa la función objetivo, \( f(x) = k \). Por comodidad se suele dibujar la recta \( f(x) = 0 \).</li>
+                    
+                    <li><strong>Paso 4:</strong> Se desplaza de manera paralela a sí misma la recta que representa la función objetivo para hallar la dirección de mejora, que será aumento o disminución en función de si el objetivo del problema que se está resolviendo es maximizar o minimizar dicha función.</li>
+                    
+                    <li><strong>Paso 5:</strong> El punto extremo de \( F \) al que le corresponde el valor óptimo para la recta que representa la función objetivo es la solución óptima finita del problema. Hay que tener en cuenta que en ocasiones se puede dar la misma situación que la anteriormente descrita y existir más de un punto extremo o que la región factible sea no acotada.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- CONTENIDO DEL EJEMPLO PRÁCTICO -->
+        <section id="ejemplo" class="tab-content">
+            <h3>Ejemplo Práctico de Programación Lineal</h3>
+            
+            <div class="columns-container">
+                <div class="column">
+                    <div class="boxed">
+                        <h4>Función Objetivo</h4>
+                        <p><strong>Maximizar</strong> \( f(x, y) = 10x + 11y \)</p>
+                        
+                        <h4>Restricciones</h4>
+                        \[
+                        \begin{cases}
+                            x + y \leqslant 20 \\
+                            x + 2y \leqslant 24 \\
+                            x \geqslant 3 \\
+                            y \geqslant 0
+                        \end{cases}
+                        \]
+                    </div>
+                    
+                    <div class="boxed highlight-strong">
+                        <h4>Puntos de Vértices</h4>
+                        <p>Los puntos de vértices de la región factible son:</p>
+                        
+                        \[
+                        \begin{align*}
+                            & (16, 4) \\
+                            & (4, 10) \\
+                            & (4, 0) \\
+                            & (20, 0)
+                        \end{align*}
+                        \]
+                    </div>
+                </div>
+                
+                <div class="column">
+                    <div class="graph-container">
+                        <h4>Región Factible</h4>
+                        <div class="graph-placeholder">
+                            <p>Representación gráfica de la región factible</p>
+                        </div>
+                        <p><em>La región factible es el área sombreada delimitada por las restricciones.</em></p>
+                    </div>
+                    
+                    <div class="boxed">
+                        <h4>Evaluación de la Función Objetivo</h4>
+                        <p>Evaluando la función objetivo en estos puntos:</p>
+                        
+                        \[
+                        \begin{align*}
+                            f(16, 4) &= 10(16) + 11(4) = 204 \\
+                            f(4, 10) &= 10(4) + 11(10) = 150 \\
+                            f(4, 0) &= 10(4) + 11(0) = 40 \\
+                            f(20, 0) &= 10(20) + 11(0) = 200
+                        \end{align*}
+                        \]
+                        
+                        <p>Por lo tanto, el máximo valor de la función objetivo es \( 204 \) y se alcanza en el punto \( x = 16 \), \( y = 4 \).</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="boxed">
+                <h4>Interpretación del Resultado</h4>
+                <p>La solución óptima del problema es producir 16 unidades del producto X y 4 unidades del producto Y, lo que genera un beneficio máximo de 204 unidades monetarias.</p>
+                <p>Esta solución satisface todas las restricciones:</p>
+                <ul>
+                    <li>\( 16 + 4 = 20 \leqslant 20 \)</li>
+                    <li>\( 16 + 2(4) = 24 \leqslant 24 \)</li>
+                    <li>\( 16 \geqslant 3 \)</li>
+                    <li>\( 4 \geqslant 0 \)</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Gestión de pestañas principales
+        document.addEventListener("DOMContentLoaded", function () {
+          const tabButtons = document.querySelectorAll(".tab-button");
+          const tabContents = document.querySelectorAll(".tab-content");
+
+          tabButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const targetId = btn.getAttribute("data-tab");
+              tabButtons.forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              tabContents.forEach((sec) => {
+                if (sec.id === targetId) sec.classList.add("active");
+                else sec.classList.remove("active");
+              });
+              if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise();
+            });
+          });
+
+          // Resaltado progresivo demostración del teorema
+          const btnDemostracion = document.getElementById("btn-demostracion");
+          const stepsContainer = document.getElementById("demostracion-steps");
+          const steps = stepsContainer ? stepsContainer.querySelectorAll(".step") : [];
+          let currentStep = -1;
+
+          function showNextStep() {
+            if (!steps.length) return;
+            if (currentStep < steps.length - 1) {
+              currentStep++;
+              steps[currentStep].classList.add("visible");
+              btnDemostracion.textContent =
+                currentStep < steps.length - 1 ? "Resaltar siguiente paso" : "Reiniciar demostración";
+              if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise();
+            } else {
+              // Reiniciar todo
+              steps.forEach((st) => st.classList.remove("visible"));
+              currentStep = -1;
+              btnDemostracion.textContent = "Resaltar siguiente paso";
+            }
+          }
+
+          if (btnDemostracion) btnDemostracion.addEventListener("click", showNextStep);
+        });
+    </script>
+</body>
+</html>

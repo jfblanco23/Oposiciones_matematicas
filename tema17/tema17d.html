@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Método del Símplex en Programación Lineal</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+          --color-primary: #008080;
+          --color-bg: #FDFBD4;
+          --color-accent: #05472A;
+          --color-yellow: #fff8a6;
+          --color-text: #222222;
+        }
+
+        body {
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          background-color: var(--color-bg);
+          color: var(--color-text);
+          line-height: 1.7;
+          padding: 1.5rem 1rem;
+          font-size: 1.24rem;
+          max-width: 1500px;
+          margin: 0 auto;
+        }
+
+        .math-block {
+          font-size: 1.19em;
+        }
+
+        .main-header {
+          border-radius: 0.75rem;
+          background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+          color: white;
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+          text-align: center;
+          box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+        }
+
+        .main-header h1 {
+          font-size: 2.1rem;
+          letter-spacing: 0.09em;
+          margin-bottom: 0.5rem;
+        }
+
+        .main-header h2 {
+          font-size: 1.06rem;
+          font-weight: 400;
+        }
+
+        /* Tabs, Content, Boxes */
+        .tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .tab-button {
+          border: none; padding: 0.7rem 1.2rem; border-radius: 999px;
+          background-color: white; color: var(--color-primary); font-weight: 600;
+          font-size: 1.08em; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+          transition: background-color 0.2s, color 0.2s, transform 0.1s;
+        }
+        .tab-button.active { background-color: var(--color-primary); color: white; }
+        .tab-button:hover { transform: translateY(-1px); }
+
+        main { max-width: 1500px; margin: 0 auto; }
+        .tab-content {
+          display: none;
+          background-color: rgb(255 255 255 / 0.92);
+          border-radius: 0.85rem;
+          padding: 1.82rem;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.09);
+          margin-bottom: 1.7rem;
+          font-size: 1.10em;
+        }
+        .tab-content.active { display: block; }
+
+        .tab-content h3 {
+          color: var(--color-accent);
+          margin-bottom: 1.02rem;
+          border-bottom: 2px solid rgba(0,128,128,0.18);
+          padding-bottom: 0.35rem;
+          font-size: 1.27em;
+        }
+
+        .tab-content h4 { margin-top: 1.17rem; margin-bottom: 0.61rem; color: var(--color-primary);}
+        .tab-content h5 { margin-top: 0.22rem; margin-bottom: 0.35rem; color: var(--color-accent); font-size:1.06em;}
+
+        p { margin-bottom: 0.67rem; }
+
+        ul, ol { margin-left: 1.32rem; margin-bottom: 1.08rem; }
+
+        /* Boxes, Highlighted */
+        .boxed {
+          border-left: 4px solid var(--color-primary);
+          background: rgba(0,128,128,0.05);
+          padding: 1.10rem 1.12rem;
+          margin: 1.01rem 0;
+          border-radius: 0.5rem;
+          font-size:1.01em;
+        }
+        .highlight-strong {
+          border-left-color: var(--color-accent);
+          background: rgba(5, 71, 42, 0.11);
+        }
+
+        /* Button y pasos demostración */
+        .step-button {
+          display: inline-block;
+          margin: 0.8rem 0 1.02rem;
+          padding: 0.67rem 1.08rem;
+          border-radius: 999px;
+          border: none;
+          background-color: var(--color-accent);
+          color: white;
+          font-weight: 600;
+          font-size: 1.07em;
+          cursor: pointer;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.14);
+          transition: background-color 0.2s, transform 0.1s;
+        }
+        .step-button:hover {
+          background-color: #07613a;
+          transform: translateY(-1px);
+        }
+
+        /* Pasos de la demostración: mantienen visible todos, pero cada .visible se resalta */
+        .step-container {
+          border-radius: 0.72rem;
+          background-color: rgb(255 255 255 / 0.97);
+          border: 1px solid rgba(0,0,0,0.07);
+          padding: 0.96rem 1rem;
+        }
+        .step {
+          padding: 0.82rem 1.09rem;
+          border-radius: 0.65rem;
+          margin-bottom: 0.58rem;
+          background: none;
+          transition: background 0.15s;
+        }
+        .step.visible {
+          background-color: var(--color-yellow);
+          box-shadow: 0 0 0 1px rgba(255,209,26,0.23);
+        }
+
+        /* Subpestañas */
+        .sub-tabs { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 0.3rem; 
+            margin: 1.5rem 0 1rem; 
+        }
+        .sub-tab-button {
+            border: none; 
+            padding: 0.5rem 1rem; 
+            border-radius: 6px;
+            background-color: rgba(0,128,128,0.1); 
+            color: var(--color-primary); 
+            font-weight: 500;
+            font-size: 0.95em; 
+            cursor: pointer; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: background-color 0.2s, color 0.2s, transform 0.1s;
+        }
+        .sub-tab-button.active { 
+            background-color: var(--color-primary); 
+            color: white; 
+        }
+        .sub-tab-button:hover { 
+            transform: translateY(-1px); 
+        }
+
+        .sub-tab-content {
+            display: none;
+            padding: 1rem 0;
+        }
+        .sub-tab-content.active { 
+            display: block; 
+        }
+
+        /* Tablas */
+        .simplex-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .simplex-table th, .simplex-table td {
+            padding: 0.8rem;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .simplex-table th {
+            background-color: var(--color-primary);
+            color: white;
+            font-weight: 600;
+        }
+        .simplex-table tr:nth-child(even) {
+            background-color: rgba(0,128,128,0.05);
+        }
+        .simplex-table .pivot {
+            background-color: var(--color-yellow);
+            font-weight: bold;
+        }
+        
+        /* MathJax: mayor tamaño */
+        .mjx-container { font-size: 1.18em !important; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+          body { padding: 0.6rem; font-size: 1.07rem;}
+          .main-header { padding: 1rem; }
+          .main-header h1 { font-size: 1.23rem; }
+          .main-header h2 { font-size: 0.93rem; }
+          .tab-content { padding: 1rem;}
+          .simplex-table {
+              font-size: 0.9rem;
+          }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <h1>EL MÉTODO DEL SÍMPLEX</h1>
+        <h2>Algoritmo Fundamental de la Programación Lineal</h2>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="introduccion">Introducción</button>
+            <button class="tab-button" data-tab="formulacion">Formulación General</button>
+            <button class="tab-button" data-tab="esquema">Esquema del Método</button>
+            <button class="tab-button" data-tab="tabla">Tabla del Símplex</button>
+            <button class="tab-button" data-tab="ejemplo">Ejemplo Práctico</button>
+        </div>
+
+        <!-- CONTENIDO DE INTRODUCCIÓN -->
+        <section id="introduccion" class="tab-content active">
+            <h3>Introducción al Método del Símplex</h3>
+            
+            <div class="boxed highlight-strong">
+                <p>El método del símplex se basa en ir pasando de una solución básica factible (i.e un punto extremo) a otra, hasta encontrar un punto extremo óptimo. Los resultados vistos hasta ahora aseguran que para buscar una solución óptima es suficiente con considerar sólo las soluciones básicas factibles.</p>
+            </div>
+            
+            <div class="boxed">
+                <h4>Observación</h4>
+                <p>Para un problema con \(n\) variables y \(m\) restricciones hay a lo sumo</p>
+                \[
+                \binom{n}{m} = \frac{n!}{m!(n - m)!}
+                \]
+                <p>soluciones básicas (que corresponden al número de formas de seleccionar \(m\) de \(n\) columnas). Es por eso que dado un problema grande, una solución de búsqueda exhaustiva haría el problema inabordable.</p>
+                
+                <p>Por tanto, es conveniente buscar una forma más eficiente de movernos entre puntos extremos de la región factible, o lo que es lo mismo, una forma eficiente de gestionar los cambios de base. Esto es precisamente lo que intenta el método del simplex.</p>
+            </div>
+        </section>
+
+        <!-- CONTENIDO DE FORMULACIÓN GENERAL -->
+        <section id="formulacion" class="tab-content">
+            <h3>Formulación General del Método del Símplex</h3>
+            
+            <div class="boxed">
+                <p>Consideremos el siguiente problema de programación lineal en forma estándar:</p>
+                \[
+                \text{minimizar } c^T x \text{ sujeto a } Ax = b, \, x \geqslant 0
+                \]
+                <p>donde \(x, c \in \mathbb{R}^n , b \in \mathbb{R}^m\) y \( A \in \mathbb{M}_{m \times n}(\mathbb{R})\) de rango m, con \(m \leqslant n\).</p>
+            </div>
+            
+            <div class="sub-tabs">
+                <button class="sub-tab-button active" data-subtab="definiciones">Definiciones</button>
+                <button class="sub-tab-button" data-subtab="desarrollo">Desarrollo Matemático</button>
+            </div>
+            
+            <!-- SUBCONTENIDO: DEFINICIONES -->
+            <div id="definiciones" class="sub-tab-content active">
+                <h4>Definiciones y Conceptos Clave</h4>
+                
+                <div class="boxed">
+                    <p>Dada una base \(B\) con una solución básica factible asociada \(x = (x_B, x_N) = (B^{-1} b, 0)\) y cuya función objetivo está dada por \(z_B\), donde</p>
+                    \[
+                    \begin{aligned}
+                        z_B = c^T x = c^T \begin{pmatrix}
+                            x_B \\
+                            x_N
+                        \end{pmatrix} = (c_B, c_N)\begin{pmatrix}
+                            B^{-1}b\\
+                            0
+                        \end{pmatrix}=  c_B^T B^{-1} b 
+                    \end{aligned}
+                    \]
+                </div>
+                
+                <div class="boxed">
+                    <p>Denotemos por \(J\) al conjunto de los índices de las variables no básicas, es decir, las columnas de \(A\) que no están en la base \(B\), y para cada columna \(a_j\) de \(A\), definimos \(y_j := B^{-1} a_j\).</p>
+                    
+                    <p>Entonces, si ponemos \(a_j\) como combinación lineal de las columnas de la base \(B\), obtenemos que el coeficiente de la columna \(i\) de \(B\) es precisamente \(y_{ij}\).</p>
+                </div>
+                
+                <div class="boxed">
+                    <p>Dado que \((x_B, x_N)\) es una solución básica factible tenemos que \(x_B \geqslant 0\), \(x_N = 0\) y \(b = Ax = B x_B + N x_N\). Despejando \(x_B\) en la ecuación anterior obtenemos</p>
+                    \[
+                    x_B = B^{-1} b - B^{-1} N x_N = B^{-1} b - \sum_{j \in J} a_j x_j= B^{-1} b - \sum_{j \in J} y_j x_j .
+                    \]
+                    
+                    <p>Esta ecuación refleja cómo cambiará \( x_B = B^{-1} b \) si alguna componente de \( x_N \) pasa a ser distinta de cero y al mismo tiempo queremos respetar las restricciones \( Ax = b \).</p>
+                </div>
+            </div>
+            
+            <!-- SUBCONTENIDO: DESARROLLO MATEMÁTICO -->
+            <div id="desarrollo" class="sub-tab-content">
+                <h4>Desarrollo Matemático del Método</h4>
+                
+                <div class="boxed">
+                    <p>Trasladando esto a la función objetivo y definiendo \(z_j := c^T B y_j\), tenemos que, dado \(x \in \mathbb{R}^n\) cualquiera,</p>
+                    \[
+                    \begin{aligned}
+                    z &= c^T x = c^T_B x_B + c^T_N x_N = c^T_B \left( \sum_{j \in J}  B^{-1} b - y_j x_j \right) +\sum_{j \in J} c_j x_j \\
+                    &= z_B - \sum_{j \in J} (c_B^T y_j - c_j) x_j = z_B - \sum_{j \in J} (z_j - c_j) x_j.
+                    \end{aligned}
+                    \]
+                </div>
+                
+                <div class="boxed highlight-strong">
+                    <p>Por tanto, para que \(z = z_B - \sum_{j \in J} (z_j - c_j) x_j\) sea menor que \(z_B\), necesitamos que algún \((z_j - c_j) > 0\). Es decir, dada una solución básica factible \((x_B, x_N)\), tenemos lo siguiente:</p>
+                    
+                    <ul>
+                        <li>Si \(z_j - c_j \leqslant 0\) para toda variable no básica \(j\), entonces \(x = (x_B, x_N)\) es una solución óptima.</li>
+                        <li>Si \(z_j - c_j > 0\) para alguna variable no básica \(j\), entonces la variable \(j\) es candidata a entrar a formar parte de la base. En dicho caso, el vector \(y_j = B^{-1} a_j\) me permite saber cómo varían las variables de la base actual a medida que aumento el valor de \(x_j\).</li>
+                    </ul>
+                </div>
+                
+                <div class="boxed">
+                    <h4>Identificación de Problemas Sin Óptimo Finito</h4>
+                    <p>Supongamos que tenemos una variable no básica \(k \in J\) para la cual \(z_k - c_k > 0\) y que, al mismo tiempo, el vector \(y_k = B^{-1} a_k\) tiene todas sus componentes menores o iguales que cero. Esto nos estaría diciendo que, a medida que aumentamos el valor de \(x_k\), el cambio inducido en las variables de la base (para mantener factibilidad) es tal que ninguna de ellas reduce su valor (\(B^{-1} b - y_k x_k \geqslant B^{-1} b \geqslant 0\)).</p>
+                    
+                    <p>Por tanto, podemos aumentar \(x_k\) indefinidamente sin perder factibilidad y mejorando la función objetivo a cada paso.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTENIDO DEL ESQUEMA DEL MÉTODO -->
+        <section id="esquema" class="tab-content">
+            <h3>Esquema General del Método del Símplex</h3>
+            
+            <div class="boxed highlight-strong">
+                <h4>Algoritmo (Símplex)</h4>
+                
+                <p><strong>Paso 0.</strong> En la forma estándar, determinamos una base \( B \) que tiene asociada una solución básica factible \( x = (x_B , x_N) \), con \( x_B = B^{-1} b \) y \( x_N = 0 \). Además, \( z_B = c^T_B B^{-1} b \).</p>
+                
+                <p><strong>Paso 1.</strong> Calculamos los valores \( z_j - c_j \) para todas las variables no básicas \( j \in J \), donde \( z_j = c^T_B B^{-1} a_j = c^T_B y_j \). Tenemos las siguientes posibilidades:</p>
+                
+                <ul>
+                    <li>Si \( z_j - c_j \leqslant 0 \) \( \forall j \), FIN. La solución básica factible \( x = (x_B , x_N) \) es óptima.</li>
+                    <li>Si \( \exists j \) tal que \( z_j - c_j > 0 \). Sea \( k \in J \) el menor índice tal que \( z_k - c_k = \max_{j \in J} \{ z_j - c_j \} \). Ir al Paso 2 con \( k \) como variable de entrada.</li>
+                </ul>
+                
+                <p><strong>Paso 2.</strong> Calculamos \( y_k = B^{-1} a_k \). Tenemos las siguientes posibilidades:</p>
+                
+                <ul>
+                    <li>Si \( y_k \leq 0 \), FIN. El problema no tiene óptimo finito.</li>
+                    <li>Si \( y_k > 0 \), entonces \( a_k \) entra en la base y \( x_k \) pasa a ser una variable básica. Abandona la base la variable \( i \) con el índice menor:</li>
+                </ul>
+                
+                \[  \frac{(x_B)_i}{ y_{ik}} = \min_{1 \leqslant r \leqslant m} \left\{ \frac{(x_B)_r}{ y_{rk}} : y_{rk} > 0 \right\} . \]
+                
+                <p>Recalcular \( B \), \( x = (x_B , x_N) \), \( z_B \) y los vectores \( y_j \). Volver al Paso 1.</p>
+            </div>
+            
+            <div class="boxed">
+                <h4>Convergencia del Método del Símplex</h4>
+                <p>El estudio de la convergencia del método del símplex está relacionado con la existencia o no de soluciones básicas degeneradas.</p>
+                
+                <p>Cuando una de las variables básicas toma el valor cero, implica que distintas bases representan al mismo punto extremo de la región factible y por tanto cuando se aplica el algoritmo (símplex) hay distintos cambios de base que pueden no mejorar la función objetivo.</p>
+            </div>
+            
+            <div class="boxed highlight-strong">
+                <h4>Teorema</h4>
+                <p>Dado un problema de programación lineal en forma estándar sin soluciones básicas degeneradas, y dada una solución básica factible inicial, el método del símplex termina en una cantidad finita de pasos, bien encontrando una solución óptima o concluyendo que no tiene solución óptima finita.</p>
+            </div>
+            
+            <div class="boxed">
+                <h4>Demostración</h4>
+                <p>En cada iteración del algoritmo pueden suceder tres cosas:</p>
+                
+                <ol>
+                    <li>Si \(z_j - c_j \leq 0\) para todo \(j\), el algoritmo termina pues estamos en una solución básica factible óptima.</li>
+                    <li>Si existe \(k\) tal que \(z_k - c_k > 0\) y, además, \(y_k \leq 0\), entonces el algoritmo termina concluyendo que no existe solución óptima finita.</li>
+                    <li>Si existe \(k\) tal que \(z_k - c_k > 0\) y, además, \(y_k \not\leq 0\), se genera una nueva solución básica factible con \(x^T = (x_B, x_N)\) con \(x_B = B^{-1} b\) y \(x_N = 0\) siendo \(B\) la nueva base resultante de la entrada de \(a_k\) y la salida de \(x_{B_i}\). En ausencia de degeneración, \(x_B\) tiene todas sus componentes estrictamente mayores que cero, y por tanto, \(\min_{1\leq r\leq m} \Bigl\{ \frac{(x_B)_r }{y_{rk}}:y_{rk}>0 \Bigl\}>0\).</li>
+                </ol>
+                
+                <p>Esta desigualdad, combinada con \(z_k - c_k > 0\), implica que la función objetivo decrece estrictamente en cada iteración y por tanto las soluciones básicas factibles obtenidas por el algoritmo son todas distintas entre sí.</p>
+                
+                <p>Como el número total de dichas soluciones es finito el algoritmo terminará en una cantidad finita de iteraciones.</p>
+            </div>
+        </section>
+
+        <!-- CONTENIDO DE LA TABLA DEL SÍMPLEX -->
+        <section id="tabla" class="tab-content">
+            <h3>La Tabla del Método del Símplex</h3>
+            
+            <div class="boxed">
+                <p>La tabla del símplex guarda en una tabla toda la información relevante de cada iteración a modo de facilitar la actualización de la misma.</p>
+                
+                <p>Supongamos que partimos de un problema en la forma estándar con una solución básica factible asociada \( x = (x_B , x_N) \). Además, para facilitar la exposición, si \( A = [B, N] \) supongamos que las \( m \) columnas de \( B \) se corresponden con las primeras \( m \) variables. Recordamos que \( N \) denota la matriz formada por las columnas de las variables no básicas. Por comodidad \( B^{-1}b =\overline{b} \).</p>
+            </div>
+            
+            <h4>Tabla del Símplex</h4>
+            
+            <table class="simplex-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th colspan="3">\(x_B\)</th>
+                        <th colspan="3">\(x_N\)</th>
+                        <th>\(\overline{z}\)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>\(z_j - c_j\)</td>
+                        <td></td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>\(c_B^T B^{-1} N - c_N\)</td>
+                        <td></td>
+                        <td></td>
+                        <td>\(c_B^T \overline{b}\)</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>\(x_B\)</td>
+                        <td>\(c_B\)</td>
+                        <td>\(I_{m \times m}\)</td>
+                        <td></td>
+                        <td></td>
+                        <td>\(B^{-1}N\)</td>
+                        <td></td>
+                        <td></td>
+                        <td>\(\overline{b}\)</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h4>Tabla Expandida</h4>
+            
+            <table class="simplex-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>\(x_{B1}\)</th>
+                        <th>\(\cdots\)</th>
+                        <th>\(x_{Br}\)</th>
+                        <th>\(\cdots\)</th>
+                        <th>\(x_{Bm}\)</th>
+                        <th>\(\cdots x_i \cdots x_k \cdots\)</th>
+                        <th>\(\overline{z}\)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>\(z_j - c_j\)</td>
+                        <td></td>
+                        <td>0</td>
+                        <td>\(\cdots\)</td>
+                        <td>0</td>
+                        <td>\(\cdots\)</td>
+                        <td>0</td>
+                        <td>\(\cdots z_i-c_i \cdots z_k-c_k \cdots\)</td>
+                        <td>\(c_B^T \overline{b}\)</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>\(x_{B1}\)</td>
+                        <td>\(c_{B1}\)</td>
+                        <td>1</td>
+                        <td>\(\cdots\)</td>
+                        <td>0</td>
+                        <td>\(\cdots\)</td>
+                        <td>0</td>
+                        <td>\(\cdots y_{1i} \cdots y_{1k} \cdots\)</td>
+                        <td>\(\overline{b_1}\)</td>
+                    </tr>
+                    <tr>
+                        <td>\(\vdots\)</td>
+                        <td>\(\vdots\)</td>
+                        <td>\(\vdots\)</td>
+                        <td></td>
+                        <td>\(\vdots\)</td>
+                        <td></td>
+                        <td>\(\vdots\)</td>
+                        <td>\(\vdots\)</td>
+                        <td>\(\vdots\)</td>
+                    </tr>
+                    <tr>
+                        <td>\(x_{Br}\)</td>
+                        <td>\(c_{Br}\)</td>
+                        <td>0</td>
+                        <td>\(\cdots\)</td>
+                        <td>1</td>
+                        <td>\(\cdots\)</td>
+                        <td>0</td>
+                        <td>\(\cdots y_{ri} \cdots y_{rk} \cdots\)</td>
+                        <td>\(\overline{b_r}\)</td>
+                    </tr>
+                    <tr>
+                        <td>\(\vdots\)</td>
+                        <td>\(\vdots\)</td>
+                        <td>\(\vdots\)</td>
+                        <td></td>
+                        <td>\(\vdots\)</td>
+                        <td></td>
+                        <td>\(\vdots\)</td>
+                        <td>\(\vdots\)</td>
+                        <td>\(\vdots\)</td>
+                    </tr>
+                    <tr>
+                        <td>\(x_{Bm}\)</td>
+                        <td>\(c_{Bm}\)</td>
+                        <td>0</td>
+                        <td>\(\cdots\)</td>
+                        <td>0</td>
+                        <td>\(\cdots\)</td>
+                        <td>1</td>
+                        <td>\(\cdots y_{mi} \cdots y_{mk} \cdots\)</td>
+                        <td>\(\overline{b_m}\)</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="boxed">
+                <h4>Actualización de la Tabla</h4>
+                <p>Supongamos entonces que decidimos que la variable \(x_k\) debe entrar en la base y la variable \(x_{Br}\) debe salir de la misma. Se asocia la nueva base a \(\widetilde{B}\). Las operaciones a realizar sobre la tabla actual deberían ser las siguientes:</p>
+                
+                <ul>
+                    <li>Se actualiza el vector \(\mathbf{c}_B\) y los valores \(b\) de las variables básicas \(x_B\).</li>
+                    <li>Se actualizan las columnas \(y_i\) y la matriz \(I_{m \times m}\) pasa a ser \(\widetilde{B}^{-1}\).</li>
+                    <li>Se actualizan los valores \(z_j - c_j\) y el valor de la función objetivo \(c_B^T \overline{b}\).</li>
+                </ul>
+                
+                <p>Obtendríamos de este modo la tabla asociada a la base \(\widetilde{B}\) y poder así iterar el algoritmo en caso de ser necesario.</p>
+            </div>
+        </section>
+
+        <!-- CONTENIDO DEL EJEMPLO PRÁCTICO -->
+        <section id="ejemplo" class="tab-content">
+            <h3>Ejemplo Práctico del Método del Símplex</h3>
+            
+            <div class="boxed highlight-strong">
+                <h4>Problema</h4>
+                <p>Dado el siguiente problema de programación lineal:</p>
+                \[
+                \text{Maximizar } 2X_1 + X_2 - X_3
+                \]
+                <p>sujeto a:</p>
+                \begin{align*}
+                    &X_1 + X_2 + 2X_3 \leqslant 6 \\
+                    &X_1 + 4X_2 - X_3 \leqslant 4 \\
+                    &X_1, X_2, X_3 \geqslant 0
+                \end{align*}
+            </div>
+            
+            <div class="boxed">
+                <h4>Solución por Puntos Extremos</h4>
+                <p>Evaluando la función objetivo en los puntos extremos del conjunto de restricciones:</p>
+                
+                \[
+                \begin{aligned}
+                    & \text{Si} \quad X_1 = 0, \quad  \begin{cases}
+                         X_2 + 2X_3 =6 \\
+                          4X_2 - X_3=4
+                    \end{cases} \Rightarrow X_2= \dfrac{14}{9} \quad X_3= \dfrac{20}{9} \quad  Z= \dfrac{-6}{9} \\
+                & \text{Si} \quad X_2 = 0, \quad  \begin{cases}
+                X_1 + 2X_3 =6 \\
+                X_1  - X_3=4
+                \end{cases} \Rightarrow X_1= \dfrac{14}{3} \quad X_3= \dfrac{2}{3} \quad  Z= \dfrac{26}{3} \\
+                & \text{Si} \quad X_3 = 0, \quad  \begin{cases}
+                    X_1 + X_2  =6 \\
+                    X_1 + 4X_2 =4
+                \end{cases} \Rightarrow X_1= \dfrac{20}{3} \quad X_2= \dfrac{-2}{3} \quad  Z= \dfrac{38}{3} \\
+                \end{aligned}
+                \]
+                
+                <p>Este último punto no es factible dado que no cumple la condición de no negatividad de las variables \(X_2 < 0\). Entre los dos puntos restantes el óptimo es:</p>
+                
+                \[
+                \begin{aligned}
+                    & X_1= \dfrac{14}{3} \quad X_2=0 \quad X_3= \dfrac{2}{3} \quad  Z= \dfrac{26}{3} 
+                \end{aligned}
+                \]
+                
+                <p>Este método de solución puede utilizarse en este caso porque el conjunto está acotado.</p>
+            </div>
+            
+            <div class="boxed">
+                <h4>Solución por el Método del Símplex</h4>
+                
+                <p><strong>Tabla Inicial</strong></p>
+                
+                <table class="simplex-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Z</th>
+                            <th>\(X_1\)</th>
+                            <th>\(X_2\)</th>
+                            <th>\(X_3\)</th>
+                            <th>\(S_1\)</th>
+                            <th>\(S_2\)</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Z</td>
+                            <td>1</td>
+                            <td>-2</td>
+                            <td>-1</td>
+                            <td>1</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>\(S_1\)</td>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>1</td>
+                            <td>0</td>
+                            <td>6</td>
+                        </tr>
+                        <tr>
+                            <td>\(S_2\)</td>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>4</td>
+                            <td>-1</td>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>4</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <p><strong>Iteración 1</strong> - Entra en la base \(X_1\) ya que tiene el coste reducido negativo, y de todos los negativos, el mayor en valor absoluto. Sale de la base:</p>
+                
+                \[
+                \min \left\{ \frac{B^{-1}b}{Y_{X_1}},Y_{X_1} > 0 \right\} = \min \left\{ \frac{6}{1}, \frac{4}{1} \right\} = 4 \implies S_2 
+                \]
+                
+                <p>El pivote es 1, entonces debemos hacer ceros por encima y por debajo de él.</p>
+                
+                <table class="simplex-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Z</th>
+                            <th>\(X_1\)</th>
+                            <th>\(X_2\)</th>
+                            <th>\(X_3\)</th>
+                            <th>\(S_1\)</th>
+                            <th>\(S_2\)</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Z</td>
+                            <td>1</td>
+                            <td>0</td>
+                            <td>7</td>
+                            <td>-1</td>
+                            <td>0</td>
+                            <td>2</td>
+                            <td>8</td>
+                        </tr>
+                        <tr>
+                            <td>\(S_1\)</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>-3</td>
+                            <td class="pivot">3</td>
+                            <td>1</td>
+                            <td>-1</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>\(X_1\)</td>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>4</td>
+                            <td>-1</td>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>4</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <p><strong>Iteración 2</strong> - Entra en la base \(X_3\) ya que tiene el coste reducido negativo. Sale de la base:</p>
+                
+                \[
+                \min \left\{ \frac{B^{-1}b}{Y_{X_3}},Y_{X_3} > 0 \right\} = \min \left\{ \frac{2}{3}, \text{Infactible} \right\} =\frac{2}{3}  \implies S_1 
+                \]
+                
+                <table class="simplex-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Z</th>
+                            <th>\(X_1\)</th>
+                            <th>\(X_2\)</th>
+                            <th>\(X_3\)</th>
+                            <th>\(S_1\)</th>
+                            <th>\(S_2\)</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Z</td>
+                            <td>1</td>
+                            <td>0</td>
+                            <td>6</td>
+                            <td>0</td>
+                            <td>\(\frac{1}{3}\)</td>
+                            <td>\(\frac{5}{3}\)</td>
+                            <td>\(\frac{26}{3}\)</td>
+                        </tr>
+                        <tr>
+                            <td>\(X_3\)</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>-1</td>
+                            <td>1</td>
+                            <td>\(\frac{1}{3}\)</td>
+                            <td>\(-\frac{1}{3}\)</td>
+                            <td>\(\frac{2}{3}\)</td>
+                        </tr>
+                        <tr>
+                            <td>\(X_1\)</td>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>3</td>
+                            <td>0</td>
+                            <td>\(\frac{1}{3}\)</td>
+                            <td>\(\frac{2}{3}\)</td>
+                            <td>\(\frac{14}{3}\)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <p>La solución que muestra la tabla es la óptima dado que todos los costes reducidos son positivos, y por lo tanto, ninguna variable puede entrar en la base con el objetivo de mejorar la solución actual. Esta solución, obviamente, se corresponde con la hallada anteriormente mediante la aplicación del método de los puntos extremos.</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Gestión de pestañas principales
+        document.addEventListener("DOMContentLoaded", function () {
+          const tabButtons = document.querySelectorAll(".tab-button");
+          const tabContents = document.querySelectorAll(".tab-content");
+
+          tabButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const targetId = btn.getAttribute("data-tab");
+              tabButtons.forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              tabContents.forEach((sec) => {
+                if (sec.id === targetId) sec.classList.add("active");
+                else sec.classList.remove("active");
+              });
+              if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise();
+            });
+          });
+
+          // Gestión de subpestañas
+          const subTabButtons = document.querySelectorAll(".sub-tab-button");
+          const subTabContents = document.querySelectorAll(".sub-tab-content");
+
+          subTabButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const parentTab = btn.closest('.tab-content');
+              const targetId = btn.getAttribute("data-subtab");
+              
+              // Solo desactivar botones dentro del mismo tab-content
+              parentTab.querySelectorAll(".sub-tab-button").forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              
+              // Solo desactivar contenidos dentro del mismo tab-content
+              parentTab.querySelectorAll(".sub-tab-content").forEach((sec) => {
+                if (sec.id === targetId) sec.classList.add("active");
+                else sec.classList.remove("active");
+              });
+              if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise();
+            });
+          });
+        });
+    </script>
+</body>
+</html>

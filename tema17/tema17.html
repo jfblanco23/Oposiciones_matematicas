@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tema 17: Programación Lineal - Aplicaciones</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+          --color-primary: #008080;
+          --color-bg: #FDFBD4;
+          --color-accent: #05472A;
+          --color-yellow: #fff8a6;
+          --color-text: #222222;
+        }
+
+        body {
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          background-color: var(--color-bg);
+          color: var(--color-text);
+          line-height: 1.7;
+          padding: 1.5rem 1rem;
+          font-size: 1.24rem;
+          max-width: 1500px;
+          margin: 0 auto;
+        }
+
+        .math-block {
+          font-size: 1.19em;
+        }
+
+        .main-header {
+          border-radius: 0.75rem;
+          background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+          color: white;
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+          text-align: center;
+          box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+        }
+
+        .main-header h1 {
+          font-size: 2.1rem;
+          letter-spacing: 0.09em;
+          margin-bottom: 0.5rem;
+        }
+
+        .main-header h2 {
+          font-size: 1.06rem;
+          font-weight: 400;
+        }
+
+        /* Tabs, Content, Boxes */
+        .tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .tab-button {
+          border: none; padding: 0.7rem 1.2rem; border-radius: 999px;
+          background-color: white; color: var(--color-primary); font-weight: 600;
+          font-size: 1.08em; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+          transition: background-color 0.2s, color 0.2s, transform 0.1s;
+        }
+        .tab-button.active { background-color: var(--color-primary); color: white; }
+        .tab-button:hover { transform: translateY(-1px); }
+
+        main { max-width: 1500px; margin: 0 auto; }
+        .tab-content {
+          display: none;
+          background-color: rgb(255 255 255 / 0.92);
+          border-radius: 0.85rem;
+          padding: 1.82rem;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.09);
+          margin-bottom: 1.7rem;
+          font-size: 1.10em;
+        }
+        .tab-content.active { display: block; }
+
+        .tab-content h3 {
+          color: var(--color-accent);
+          margin-bottom: 1.02rem;
+          border-bottom: 2px solid rgba(0,128,128,0.18);
+          padding-bottom: 0.35rem;
+          font-size: 1.27em;
+        }
+
+        .tab-content h4 { margin-top: 1.17rem; margin-bottom: 0.61rem; color: var(--color-primary);}
+        .tab-content h5 { margin-top: 0.22rem; margin-bottom: 0.35rem; color: var(--color-accent); font-size:1.06em;}
+
+        p { margin-bottom: 0.67rem; }
+
+        ul, ol { margin-left: 1.32rem; margin-bottom: 1.08rem; }
+
+        /* Boxes, Highlighted */
+        .boxed {
+          border-left: 4px solid var(--color-primary);
+          background: rgba(0,128,128,0.05);
+          padding: 1.10rem 1.12rem;
+          margin: 1.01rem 0;
+          border-radius: 0.5rem;
+          font-size:1.01em;
+        }
+        .highlight-strong {
+          border-left-color: var(--color-accent);
+          background: rgba(5, 71, 42, 0.11);
+        }
+
+        /* Button y pasos demostración */
+        .step-button {
+          display: inline-block;
+          margin: 0.8rem 0 1.02rem;
+          padding: 0.67rem 1.08rem;
+          border-radius: 999px;
+          border: none;
+          background-color: var(--color-accent);
+          color: white;
+          font-weight: 600;
+          font-size: 1.07em;
+          cursor: pointer;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.14);
+          transition: background-color 0.2s, transform 0.1s;
+        }
+        .step-button:hover {
+          background-color: #07613a;
+          transform: translateY(-1px);
+        }
+
+        /* Pasos de la demostración: mantienen visible todos, pero cada .visible se resalta */
+        .step-container {
+          border-radius: 0.72rem;
+          background-color: rgb(255 255 255 / 0.97);
+          border: 1px solid rgba(0,0,0,0.07);
+          padding: 0.96rem 1rem;
+        }
+        .step {
+          padding: 0.82rem 1.09rem;
+          border-radius: 0.65rem;
+          margin-bottom: 0.58rem;
+          background: none;
+          transition: background 0.15s;
+        }
+        .step.visible {
+          background-color: var(--color-yellow);
+          box-shadow: 0 0 0 1px rgba(255,209,26,0.23);
+        }
+
+        /* Subpestañas */
+        .sub-tabs { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 0.3rem; 
+            margin: 1.5rem 0 1rem; 
+        }
+        .sub-tab-button {
+            border: none; 
+            padding: 0.5rem 1rem; 
+            border-radius: 6px;
+            background-color: rgba(0,128,128,0.1); 
+            color: var(--color-primary); 
+            font-weight: 500;
+            font-size: 0.95em; 
+            cursor: pointer; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: background-color 0.2s, color 0.2s, transform 0.1s;
+        }
+        .sub-tab-button.active { 
+            background-color: var(--color-primary); 
+            color: white; 
+        }
+        .sub-tab-button:hover { 
+            transform: translateY(-1px); 
+        }
+
+        .sub-tab-content {
+            display: none;
+            padding: 1rem 0;
+        }
+        .sub-tab-content.active { 
+            display: block; 
+        }
+
+        /* MathJax: mayor tamaño */
+        .mjx-container { font-size: 1.18em !important; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+          body { padding: 0.6rem; font-size: 1.07rem;}
+          .main-header { padding: 1rem; }
+          .main-header h1 { font-size: 1.23rem; }
+          .main-header h2 { font-size: 0.93rem; }
+          .tab-content { padding: 1rem;}
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <h1>TEMA 17</h1>
+        <h2>PROGRAMACIÓN LINEAL. APLICACIONES</h2>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="introduccion">Introducción</button>
+            <button class="tab-button" data-tab="programacion-lineal">Programación Lineal</button>
+            <button class="tab-button" data-tab="conjuntos-convexos">Conjuntos Convexos</button>
+        </div>
+
+        <!-- CONTENIDO DE INTRODUCCIÓN -->
+        <section id="introduccion" class="tab-content active">
+            <h3>Introducción</h3>
+            <p>La historia de la Programación Lineal es bastante reciente, ya que se desarrolló principalmente a partir de la Segunda Guerra Mundial, ante la necesidad urgente de asignar recursos escasos a las distintas operaciones militares y a las actividades dentro de cada operación. Para ponernos en situación, vamos a hacer una breve reseña histórica destacando los aspectos más relevantes:</p>
+            
+            <ul>
+                <li><strong>1600-1700</strong>. En la segunda mitad del siglo XVII destacan los estudios sobre máximos y mínimos condicionados, realizados por ilustres matemáticos como Newton (1642-1727), Leibnitz (1646-1716) y Bernoulli (1623-1708).</li>
+                
+                <li><strong>1701-1800</strong>. Las primeras pinceladas sobre Programación Lineal de manera imprecisa fueron dadas por Lagrange (1736-1813) y Jean Baptiste-Joseph Fourier (1768-1830); posteriormente, Gaspar Monge (1746-1818) también se interesó por este tipo de problemas.</li>
+                
+                <li><strong>1900-1930</strong>. En 1928 John von Neumann (1903-1957), creó la Teoría de Juegos.</li>
+                
+                <li><strong>1931-1940</strong>. Los inicios de la Programación Lineal, propiamente dicha se sitúan en 1939. El primer nombre relevante es el de Leonid Kantoróvitch (1912-1986), economista, matemático e ingeniero. Fue director del Instituto de Matemáticas y del Instituto de Control de la Economía Nacional de la Unión Soviética. En uno de sus primeros libros ya hacía mención a sus teorías acerca de la asignación óptima de recursos escasos. De la mano de Tjalling Koopmans continuó investigando sobre la gran potencialidad de aplicación de los modelos de Programación Lineal a la Economía. Tanto fue el interés de sus estudios que en 1975 ambos fueron galardonados con el Premio Nobel de Economía.</li>
+                
+                <li><strong>1940-1950</strong>. Destaca George Stigler en 1945 con la creación del problema de la dieta. Un hito fundamental en el desarrollo de la Programación Lineal fue la introducción por parte de G. B. Dantzig del método Simplex en 1947, un algoritmo que permite resolver este tipo de problemas de forma recursiva y fácilmente implementable. Dantzig se apoyó en diferentes modelos informáticos de la International Business Machines (IBM). En el mismo año (1947), John Von Neumann relacionó los problemas de Programación Lineal con la teoría de matrices y desarrolló la teoría de la dualidad.</li>
+                
+                <li><strong>Desde 1950</strong>. A partir de ese momento, matemáticos y economistas comienzan a interesarse por este novedoso tema de investigación consiguiendo un gran avance. En 1984 Narendra Karmarkar creó el llamado algoritmo de Karmarkar, que supera en eficiencia al algoritmo del simplex para el tratamiento de problemas de Programación Lineal con un gran número de variables y restricciones.</li>
+                
+                <li><strong>Desde 1995</strong> Desarrollo de muchas variantes de punto interior muy eficientes para problemas de grandes dimensiones.</li>
+            </ul>
+        </section>
+
+        <!-- CONTENIDO DE PROGRAMACIÓN LINEAL -->
+        <section id="programacion-lineal" class="tab-content">
+            <h3>Programación Lineal</h3>
+            
+            <div class="sub-tabs">
+                <button class="sub-tab-button active" data-subtab="terminologia">Terminología</button>
+                <button class="sub-tab-button" data-subtab="problemas">Problemas de PL</button>
+                <button class="sub-tab-button" data-subtab="formas">Formas</button>
+                <button class="sub-tab-button" data-subtab="propiedades">Propiedades</button>
+            </div>
+            
+            <!-- SUBCONTENIDO: TERMINOLOGÍA -->
+            <div id="terminologia" class="sub-tab-content active">
+                <p>En el planteamiento y resolución de problemas de Programación Lineal utilizaremos la siguiente terminología:</p>
+                
+                <ul>
+                    <li><strong>Función objetivo:</strong> Función matemática que, junto con las restricciones, relaciona todas las variables que intervienen en el problema y será la función que deseamos optimizar (maximizar o minimizar).</li>
+                    
+                    <li><strong>Variables de decisión:</strong> Son las incógnitas de la función objetivo, es decir, las variables del problema, cuyo valor hay que calcular para dar la solución del mismo.</li>
+                    
+                    <li><strong>Restricciones:</strong> Conjunto de ecuaciones y/o inecuaciones que constituyen las limitaciones del problema sobre las variables de decisión.</li>
+                    
+                    <li><strong>Restricciones de no negatividad:</strong> Inecuaciones que establecen que el valor de las variables de decisión debe ser mayor o igual que cero.</li>
+                    
+                    <li><strong>Solución factible:</strong> Es un conjunto de valores de las variables de decisión que verifica todas las restricciones del problema.</li>
+                    
+                    <li><strong>Región factible:</strong> Es el conjunto de todas las soluciones factibles del problema.</li>
+                </ul>
+            </div>
+            
+            <!-- SUBCONTENIDO: PROBLEMAS DE PROGRAMACIÓN LINEAL -->
+            <div id="problemas" class="sub-tab-content">
+                <p>Los problemas de Programación Lineal se caracterizan porque, tanto la función objetivo como las <strong>restricciones son lineales</strong> en las variables de decisión.</p>
+                
+                <p>Un problema de Programación Lineal pretende maximizar o minimizar una función objetivo lineal de \( n \) variables \( x_1, \ldots, x_n \):</p>
+                
+                \[ f(x_1, \ldots, x_n) = c_1x_1 + c_2x_2 + \ldots + c_nx_n \]
+                
+                <p>sujeto a un conjunto de \( m \) ecuaciones o inecuaciones lineales, denominadas restricciones:</p>
+                
+                \[ a_{i1}x_1 + a_{i2}x_2 + \ldots + a_{in}x_n(\leqslant , \geqslant \text{ ó} =) b_i, \quad i = 1, \ldots, m \]
+                
+                <p>donde:</p>
+                
+                <ul>
+                    <li>Los valores \( c_i \in \mathbb{R} \), \( i = 1, \ldots, n \) se denominan coeficientes de beneficio o coste.</li>
+                    <li>Los valores \( a_{ij} \in \mathbb{R} \) (\( i = 1, \ldots, m \); \( j = 1, \ldots, n \)) son coeficientes tecnológicos.</li>
+                    <li>Los valores de \( b_i \in \mathbb{R} \), \( i = 1, \ldots, m \) se denominan términos a la derecha, vector de disponibilidades o requerimientos.</li>
+                </ul>
+                
+                <p>Por último, se imponen también las restricciones de no negatividad de las variables de decisión:</p>
+                
+                \[ x_1, \ldots, x_n \geqslant 0 \]
+                
+                <div class="boxed highlight-strong">
+                    <p>La formulación matemática de un problema de Programación Lineal es, por tanto:</p>
+                    
+                    \[ \min (\max) Z = c_1x_1 + c_2x_2 + \ldots + c_nx_n \]
+                    
+                    <p>sujeto a:</p>
+                    
+                    \[ a_{11}x_1 + a_{12}x_2 + \ldots + a_{1n}x_n (\leqslant , \geqslant \text{ ó } =) b_1 \]
+                    \[ \vdots \]
+                    \[ a_{m1}x_1 + a_{m2}x_2 + \ldots + a_{mn}x_n (\leqslant , \geqslant \text{ ó } =) b_m \]
+                    \[ x_1, \ldots, x_n \geqslant 0  \]
+                </div>
+                
+                <div class="boxed highlight-strong">
+                    <p>Equivalentemente, este tipo de problemas se puede expresar matricialmente definiendo los siguientes vectores y matrices:</p>
+                    
+                    \[
+                    \mathbf{c} = \begin{pmatrix}
+                        c_1 \\
+                        c_2 \\
+                        \vdots \\
+                        c_n
+                    \end{pmatrix}, \quad
+                    \mathbf{x} = \begin{pmatrix}
+                        x_1 \\
+                        x_2 \\
+                        \vdots \\
+                        x_n
+                    \end{pmatrix}, \quad
+                    \mathbf{b} = \begin{pmatrix}
+                        b_1 \\
+                        b_2 \\
+                        \vdots \\
+                        b_m
+                    \end{pmatrix},
+                    \mathbf{A} = \begin{pmatrix}
+                        a_{11} & a_{12} & \cdots & a_{1n} \\
+                        a_{21} & a_{22} & \cdots & a_{2n} \\
+                        \vdots & \vdots & \ddots & \vdots \\
+                        a_{m1} & a_{m2} & \cdots & a_{mn}
+                    \end{pmatrix}.
+                    \]
+                    
+                    <p>Con esta notación, el problema de Programación Lineal se puede reescribir de la siguiente forma:</p>
+                    
+                    \[
+                    \text{máx (mín)} \ Z = \mathbf{c}^T \mathbf{x}
+                    \]
+                    <p>sujeto a:</p>
+                    \[ \mathbf{Ax} (\leq, \geqslant \ \text{ó} \ =) \ \mathbf{b}\]
+                    \[
+                    \mathbf{x} \geqslant \mathbf{0}.
+                    \]
+                </div>
+                
+                <p>Un problema de Programación Lineal se puede representar de diferentes formas, todas ellas equivalentes, como se establece a continuación.</p>
+            </div>
+            
+            <!-- SUBCONTENIDO: FORMAS -->
+            <div id="formas" class="sub-tab-content">
+                <h4>Formas de representación de problemas de Programación Lineal</h4>
+                
+                <div class="boxed">
+                    <h5>Forma Canónica</h5>
+                    <p>Diremos que un problema de Programación Lineal está expresado en <strong>forma canónica</strong> cuando todas las restricciones del enunciado (excluyendo las que indican que las variables son no negativas) tienen el mismo tipo de desigualdad (\( \leqslant \) ó \( \geqslant \)).</p>
+                    
+                    <div style="display: flex; justify-content: space-between;">
+                        <div style="width: 48%;">
+                            <p>Para minimizar:</p>
+                            \[
+                            \min Z = \mathbf{c}^T \mathbf{x}
+                            \]
+                            <p>s.a.</p>
+                            \[
+                            \mathbf{Ax} \geqslant \mathbf{b} \]
+                            \[ \quad \mathbf{x} \geqslant \mathbf{0}
+                            \]
+                        </div>
+                        <div style="width: 48%;">
+                            <p>Para maximizar:</p>
+                            \[
+                            \max Z = \mathbf{c}^T \mathbf{x}
+                            \]
+                            <p>s.a.</p>
+                            \[
+                            \mathbf{Ax} \leqslant \mathbf{b} \]
+                            \[ \quad \mathbf{x} \geqslant \mathbf{0}
+                            \]
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="boxed highlight-strong">
+                    <h5>Forma Estándar</h5>
+                    <p>Diremos que un problema de Programación Lineal está expresado en <strong>forma estándar</strong> cuando todas las restricciones del enunciado (excluyendo las que indican que las variables son no negativas) tienen signo de igualdad.</p>
+                    
+                    <div style="display: flex; justify-content: space-between;">
+                        <div style="width: 48%;">
+                            <p>Para minimizar:</p>
+                            \[
+                            \min Z = \mathbf{c}^T \mathbf{x}
+                            \]
+                            <p>s.a.</p>
+                            \[
+                            \mathbf{Ax} = \mathbf{b} \]
+                            \[ \quad \mathbf{x} \geqslant \mathbf{0}
+                            \]
+                        </div>
+                        <div style="width: 48%;">
+                            <p>Para maximizar:</p>
+                            \[
+                            \max Z = \mathbf{c}^T \mathbf{x}
+                            \]
+                            <p>s.a.</p>
+                            \[
+                            \mathbf{Ax} =\mathbf{b} \]
+                            \[ \quad \mathbf{x} \geqslant \mathbf{0}
+                            \]
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="boxed">
+                    <h5>Forma Mixta</h5>
+                    <p>Diremos que un problema de Programación Lineal está expresado en <strong>forma mixta</strong> cuando todas las restricciones del enunciado (excluyendo las que indican que las variables son no negativas) tienen tanto signos de desigualdad (\( \leqslant \) ó \( \geqslant \)) como signos de igualdad.</p>
+                    
+                    <div style="display: flex; justify-content: space-between;">
+                        <div style="width: 48%;">
+                            <p>Para minimizar:</p>
+                            \[
+                            \min Z = \mathbf{c}^T \mathbf{x}
+                            \]
+                            <p>s.a.</p>
+                            \[
+                            \mathbf{Ax} \geqslant \mathbf{b} \]
+                            \[
+                            \mathbf{Bx} = \mathbf{b'} \]
+                            \[ \quad \mathbf{x} \geqslant \mathbf{0}
+                            \]
+                        </div>
+                        <div style="width: 48%;">
+                            <p>Para maximizar:</p>
+                            \[
+                            \max Z = \mathbf{c}^T \mathbf{x}
+                            \]
+                            <p>s.a.</p>
+                            \[
+                            \mathbf{Ax} \leqslant \mathbf{b} \]
+                            \[
+                            \mathbf{Bx} = \mathbf{b'} \]
+                            \[ \quad \mathbf{x} \geqslant \mathbf{0}
+                            \]
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SUBCONTENIDO: PROPIEDADES -->
+            <div id="propiedades" class="sub-tab-content">
+                <h4>Propiedades para transformar entre formas</h4>
+                
+                <div class="boxed">
+                    <h5>Propiedad 1</h5>
+                    <p>Sea \( f: \mathbb{R} \rightarrow \mathbb{R} \) una función lineal. Supongamos que \( f \) tiene mínimo en su dominio. Entonces la función \( -f \) tiene máximo y se cumple que</p>
+                    
+                    \[ \min f(x) = -\max (-f(x)). \]
+                    
+                    <p>Esta propiedad permite expresar cualquier problema en forma de maximizar o minimizar.</p>
+                </div>
+                
+                <div class="boxed">
+                    <h5>Propiedad 2</h5>
+                    <p>Cualquier restricción lineal en términos de igualdad \( ax = b \) es equivalente a dos restricciones en términos de desigualdad:</p>
+                    
+                    \[ a^T x \leqslant b \]
+                    \[ a^Tx \geqslant b \]
+                    
+                    <p>Esta propiedad permite expresar cualquier restricción en otras equivalentes en términos de desigualdad.</p>
+                </div>
+                
+                <div class="boxed">
+                    <h5>Propiedad 3</h5>
+                    <p>Cualquier restricción en términos de desigualdad del tipo \( a^Tx \geqslant b \) es equivalente a \( a^Tx - x^h = b \). </p>
+                    
+                    <p>Análogamente, cualquier restricción en términos de desigualdad del tipo \( a^Tx \leqslant b \) es equivalente a \(  a^Tx + x^h = b \), donde \( x \) es no negativa y se denomina <strong>variable de holgura</strong>.</p>
+                    
+                    <p>Esta propiedad permite expresar cualquier restricción en otra equivalente en términos de igualdad.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTENIDO DE CONJUNTOS CONVEXOS -->
+        <section id="conjuntos-convexos" class="tab-content">
+            <h3>Conjuntos Convexos</h3>
+            
+            <div class="boxed">
+                <h4>Definición</h4>
+                <p>Se denomina combinación lineal convexa de \( x_1, \ldots, x_k \in \mathbb{R}^n \) a una combinación lineal de los mismos donde los coeficientes son no negativos y suman \( 1 \),</p>
+                
+                \[
+                \sum_{i=1}^{k} \lambda_i x_i \quad \text{con} \quad \lambda_i \in [0,1] \quad \text{y} \quad \sum_{i=1}^{k} \lambda_i = 1.
+                \]
+                
+                <p>Se dice que un conjunto \( S \in \mathbb{R}^n \), \( S \neq \emptyset \), es convexo si cualquier combinación lineal convexa de dos puntos del conjunto pertenece también a dicho conjunto.</p>
+                
+                <p>Geométricamente, esto significa que, dados dos puntos cualesquiera del conjunto, el segmento que los une está completamente dentro de dicho conjunto:</p>
+                
+                \[
+                \forall x_1, x_2 \in S, \quad \forall \lambda \in [0,1], \quad \lambda x_1 + (1 - \lambda)x_2 \in S.
+                \]
+                
+                <p>La expresión \( \lambda x_1 + (1 - \lambda)x_2 \) se conoce como combinación lineal convexa de \( x_1 \) y \( x_2 \).</p>
+            </div>
+            
+            <div class="boxed">
+                <h4>Proposición</h4>
+                <p>La región factible de un problema de Programación Lineal es un conjunto convexo.</p>
+                
+                <button id="btn-equivalencia" class="step-button">Resaltar siguiente paso</button>
+                
+                <div id="equivalencia-steps" class="step-container">
+                    <div class="step">
+                        <h5>Demostración</h5>
+                        <p>Sin pérdida de generalidad, se va a demostrar para una región factible en forma estándar. Sean \( x_1 \in \mathbb{R}^n \) y \( x_2 \in \mathbb{R}^n \) soluciones factibles; entonces \( Ax_1 = b \), \( Ax_2 = b \), \( x_1 \geq 0 \), \( x_2 \geq 0 \). Considérese una combinación lineal convexa \( x \) de estos dos:</p>
+                        
+                        \[ x = \lambda x_1 + (1 - \lambda)x_2, \]
+                        
+                        <p>donde \( \lambda \in [0,1] \). Veamos que \( Ax = b \); en efecto,</p>
+                        
+                        \[ Ax = \lambda Ax_1 + (1 - \lambda)Ax_2 = \lambda b + (1 - \lambda)b = b. \]
+                    </div>
+                    
+                    <div class="step">
+                        <p>Veamos ahora si se cumple que \( x \geq 0 \). Efectivamente, al ser \( \lambda \in [0,1] \), tenemos que \( \lambda \geq 0 \) y \( 1 - \lambda \geq 0 \). Por tanto, claramente \( x = \lambda x_1 + (1 - \lambda)x_2 \geq 0 \), por ser suma de cantidades no negativas. Por lo que \( x \) es también una solución factible.</p>
+                        
+                        <p>Por lo tanto, la región factible es convexa.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="boxed">
+                <h4>Definición</h4>
+                <p>Dado un conjunto convexo \( S \), un <strong>punto extremo</strong> de \( S \) es un punto que no se puede escribir como combinación convexa no trivial de dos puntos de \( S \). </p>
+                
+                <p>Es decir, \( x \) es extremo de \( S \), si y solo si,</p>
+                
+                \[ x = \lambda x_1 + (1 - \lambda)x_2, \quad \text{con} \quad x_1, x_2 \in S \quad \text{y} \quad \lambda \in (0,1), \]
+                
+                <p>implica que \( x = x_1 = x_2 \).</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Gestión de pestañas principales
+        document.addEventListener("DOMContentLoaded", function () {
+          const tabButtons = document.querySelectorAll(".tab-button");
+          const tabContents = document.querySelectorAll(".tab-content");
+
+          tabButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const targetId = btn.getAttribute("data-tab");
+              tabButtons.forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              tabContents.forEach((sec) => {
+                if (sec.id === targetId) sec.classList.add("active");
+                else sec.classList.remove("active");
+              });
+              if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise();
+            });
+          });
+
+          // Gestión de subpestañas
+          const subTabButtons = document.querySelectorAll(".sub-tab-button");
+          const subTabContents = document.querySelectorAll(".sub-tab-content");
+
+          subTabButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const parentTab = btn.closest('.tab-content');
+              const targetId = btn.getAttribute("data-subtab");
+              
+              // Solo desactivar botones dentro del mismo tab-content
+              parentTab.querySelectorAll(".sub-tab-button").forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              
+              // Solo desactivar contenidos dentro del mismo tab-content
+              parentTab.querySelectorAll(".sub-tab-content").forEach((sec) => {
+                if (sec.id === targetId) sec.classList.add("active");
+                else sec.classList.remove("active");
+              });
+              if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise();
+            });
+          });
+
+          // Resaltado progresivo demostración teorema equivalencia (acumula visibilidad)
+          const btnEquiv = document.getElementById("btn-equivalencia");
+          const stepsContainer = document.getElementById("equivalencia-steps");
+          const steps = stepsContainer ? stepsContainer.querySelectorAll(".step") : [];
+          let currentStep = -1;
+
+          function showNextStep() {
+            if (!steps.length) return;
+            if (currentStep < steps.length - 1) {
+              currentStep++;
+              steps[currentStep].classList.add("visible");
+              btnEquiv.textContent =
+                currentStep < steps.length - 1 ? "Resaltar siguiente paso" : "Reiniciar demostración";
+              if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise();
+            } else {
+              // Reiniciar todo
+              steps.forEach((st) => st.classList.remove("visible"));
+              currentStep = -1;
+              btnEquiv.textContent = "Resaltar siguiente paso";
+            }
+          }
+
+          if (btnEquiv) btnEquiv.addEventListener("click", showNextStep);
+        });
+    </script>
+</body>
+</html>

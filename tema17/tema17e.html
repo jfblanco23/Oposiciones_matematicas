@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dualidad y Ejemplos de Programación Lineal</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+          --color-primary: #008080;
+          --color-bg: #FDFBD4;
+          --color-accent: #05472A;
+          --color-yellow: #fff8a6;
+          --color-text: #222222;
+        }
+
+        body {
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          background-color: var(--color-bg);
+          color: var(--color-text);
+          line-height: 1.7;
+          padding: 1.5rem 1rem;
+          font-size: 1.24rem;
+          max-width: 1500px;
+          margin: 0 auto;
+        }
+
+        .math-block {
+          font-size: 1.19em;
+        }
+
+        .main-header {
+          border-radius: 0.75rem;
+          background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+          color: white;
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+          text-align: center;
+          box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+        }
+
+        .main-header h1 {
+          font-size: 2.1rem;
+          letter-spacing: 0.09em;
+          margin-bottom: 0.5rem;
+        }
+
+        .main-header h2 {
+          font-size: 1.06rem;
+          font-weight: 400;
+        }
+
+        /* Tabs, Content, Boxes */
+        .tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .tab-button {
+          border: none; padding: 0.7rem 1.2rem; border-radius: 999px;
+          background-color: white; color: var(--color-primary); font-weight: 600;
+          font-size: 1.08em; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+          transition: background-color 0.2s, color 0.2s, transform 0.1s;
+        }
+        .tab-button.active { background-color: var(--color-primary); color: white; }
+        .tab-button:hover { transform: translateY(-1px); }
+
+        main { max-width: 1500px; margin: 0 auto; }
+        .tab-content {
+          display: none;
+          background-color: rgb(255 255 255 / 0.92);
+          border-radius: 0.85rem;
+          padding: 1.82rem;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.09);
+          margin-bottom: 1.7rem;
+          font-size: 1.10em;
+        }
+        .tab-content.active { display: block; }
+
+        .tab-content h3 {
+          color: var(--color-accent);
+          margin-bottom: 1.02rem;
+          border-bottom: 2px solid rgba(0,128,128,0.18);
+          padding-bottom: 0.35rem;
+          font-size: 1.27em;
+        }
+
+        .tab-content h4 { margin-top: 1.17rem; margin-bottom: 0.61rem; color: var(--color-primary);}
+        .tab-content h5 { margin-top: 0.22rem; margin-bottom: 0.35rem; color: var(--color-accent); font-size:1.06em;}
+
+        p { margin-bottom: 0.67rem; }
+
+        ul, ol { margin-left: 1.32rem; margin-bottom: 1.08rem; }
+
+        /* Boxes, Highlighted */
+        .boxed {
+          border-left: 4px solid var(--color-primary);
+          background: rgba(0,128,128,0.05);
+          padding: 1.10rem 1.12rem;
+          margin: 1.01rem 0;
+          border-radius: 0.5rem;
+          font-size:1.01em;
+        }
+        .highlight-strong {
+          border-left-color: var(--color-accent);
+          background: rgba(5, 71, 42, 0.11);
+        }
+
+        /* Button y pasos demostración */
+        .step-button {
+          display: inline-block;
+          margin: 0.8rem 0 1.02rem;
+          padding: 0.67rem 1.08rem;
+          border-radius: 999px;
+          border: none;
+          background-color: var(--color-accent);
+          color: white;
+          font-weight: 600;
+          font-size: 1.07em;
+          cursor: pointer;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.14);
+          transition: background-color 0.2s, transform 0.1s;
+        }
+        .step-button:hover {
+          background-color: #07613a;
+          transform: translateY(-1px);
+        }
+
+        /* Pasos de la demostración: mantienen visible todos, pero cada .visible se resalta */
+        .step-container {
+          border-radius: 0.72rem;
+          background-color: rgb(255 255 255 / 0.97);
+          border: 1px solid rgba(0,0,0,0.07);
+          padding: 0.96rem 1rem;
+        }
+        .step {
+          padding: 0.82rem 1.09rem;
+          border-radius: 0.65rem;
+          margin-bottom: 0.58rem;
+          background: none;
+          transition: background 0.15s;
+        }
+        .step.visible {
+          background-color: var(--color-yellow);
+          box-shadow: 0 0 0 1px rgba(255,209,26,0.23);
+        }
+
+        /* Subpestañas */
+        .sub-tabs { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 0.3rem; 
+            margin: 1.5rem 0 1rem; 
+        }
+        .sub-tab-button {
+            border: none; 
+            padding: 0.5rem 1rem; 
+            border-radius: 6px;
+            background-color: rgba(0,128,128,0.1); 
+            color: var(--color-primary); 
+            font-weight: 500;
+            font-size: 0.95em; 
+            cursor: pointer; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: background-color 0.2s, color 0.2s, transform 0.1s;
+        }
+        .sub-tab-button.active { 
+            background-color: var(--color-primary); 
+            color: white; 
+        }
+        .sub-tab-button:hover { 
+            transform: translateY(-1px); 
+        }
+
+        .sub-tab-content {
+            display: none;
+            padding: 1rem 0;
+        }
+        .sub-tab-content.active { 
+            display: block; 
+        }
+
+        /* Tablas */
+        .dual-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .dual-table th, .dual-table td {
+            padding: 0.8rem;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .dual-table th {
+            background-color: var(--color-primary);
+            color: white;
+            font-weight: 600;
+        }
+        .dual-table tr:nth-child(even) {
+            background-color: rgba(0,128,128,0.05);
+        }
+        
+        /* MathJax: mayor tamaño */
+        .mjx-container { font-size: 1.18em !important; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+          body { padding: 0.6rem; font-size: 1.07rem;}
+          .main-header { padding: 1rem; }
+          .main-header h1 { font-size: 1.23rem; }
+          .main-header h2 { font-size: 0.93rem; }
+          .tab-content { padding: 1rem;}
+          .dual-table {
+              font-size: 0.9rem;
+          }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <h1>DUALIDAD EN PROGRAMACIÓN LINEAL</h1>
+        <h2>Problemas Primal-Dual y Ejemplos de Aplicación</h2>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="dualidad">Dualidad</button>
+            <button class="tab-button" data-tab="ejemplos">Ejemplos de PL</button>
+            <button class="tab-button" data-tab="conclusion">Conclusión</button>
+        </div>
+
+        <!-- CONTENIDO DE DUALIDAD -->
+        <section id="dualidad" class="tab-content active">
+            <h3>Dualidad en Programación Lineal</h3>
+            
+            <div class="boxed highlight-strong">
+                <p>A todo problema de programación lineal le podemos asociar un nuevo problema de programación lineal, conocido como problema dual. Este nuevo problema tiene importantes propiedades. En particular, puede ser usado para resolver el problema original, que llamaremos primal durante esta sección.</p>
+            </div>
+            
+            <div class="sub-tabs">
+                <button class="sub-tab-button active" data-subtab="formulacion">Formulación</button>
+                <button class="sub-tab-button" data-subtab="relaciones">Relaciones Primal-Dual</button>
+                <button class="sub-tab-button" data-subtab="ejemplo-dual">Ejemplo</button>
+                <button class="sub-tab-button" data-subtab="propiedades">Propiedades</button>
+            </div>
+            
+            <!-- SUBCONTENIDO: FORMULACIÓN -->
+            <div id="formulacion" class="sub-tab-content active">
+                <h4>Formulación del Problema Dual</h4>
+                
+                <div class="boxed">
+                    <p>Presentamos la formulación dual de un problema de programación lineal en forma estándar:</p>
+                    
+                    <div style="display: flex; justify-content: space-between; margin: 1rem 0;">
+                        <div style="width: 48%;">
+                            <h5>Primal</h5>
+                            \[
+                            \begin{aligned}
+                                \text{minimizar} \quad & c^T x \\
+                                \text{sujeto a} \quad & Ax = b \\
+                                & x \geqslant 0
+                            \end{aligned}
+                            \]
+                        </div>
+                        <div style="width: 48%;">
+                            <h5>Dual</h5>
+                            \[
+                            \begin{aligned}
+                                \text{maximizar} \quad & \lambda^T b \\
+                                \text{sujeto a} \quad & \lambda^T A \leqslant c^T
+                            \end{aligned}
+                            \]
+                        </div>
+                    </div>
+                    
+                    <p>Donde \(x, c \in \mathbb{R}^n\), \(b, \lambda \in \mathbb{R}^m\), y \(A \in \mathbb{M}_{m \times n}\), con \(m \leq n\). \(x\) es la variable del problema primal y \(\lambda\) es la variable del problema dual.</p>
+                </div>
+            </div>
+            
+            <!-- SUBCONTENIDO: RELACIONES PRIMAL-DUAL -->
+            <div id="relaciones" class="sub-tab-content">
+                <h4>Relaciones entre Primal y Dual</h4>
+                
+                <div class="boxed">
+                    <p>Veamos a continuación algunas relaciones entre el problema primal y su dual:</p>
+                    
+                    <ul>
+                        <li>Si el primal es un problema de minimización, entonces el dual lo es de maximización (y viceversa).</li>
+                        <li>La matriz del problema dual es la matriz traspuesta \(A^T\) del problema primal (\(\lambda^T A = c^T\) es equivalente a \(A^T \lambda = c\)).</li>
+                        <li>Cada variable del primal corresponde con una restricción del dual.</li>
+                        <li>Cada restricción del primal se corresponde con una variable del dual.</li>
+                        <li>El vector \(b\) de términos independientes del primal pasa a ser el vector de coeficientes de la función objetivo del dual.</li>
+                        <li>El vector \(c\) de coeficientes de la función objetivo del primal pasa a ser el vector de términos independientes del dual.</li>
+                        <li>Restricciones de igualdad pasan a variables no restringidas y restricciones de mayor o igual pasan a variables no negativas.</li>
+                    </ul>
+                </div>
+                
+                <div class="boxed highlight-strong">
+                    <h4>Tabla de Relaciones Primal-Dual</h4>
+                    
+                    <table class="dual-table">
+                        <thead>
+                            <tr>
+                                <th colspan="3">Relaciones entre Primal y Dual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="3"><strong>Variables</strong></td>
+                                <td>\(\geqslant 0\)</td>
+                                <td>\(\longleftrightarrow\)</td>
+                                <td>\(\leqslant\)</td>
+                                <td rowspan="3"><strong>Restricciones</strong></td>
+                            </tr>
+                            <tr>
+                                <td>\(\leqslant 0\)</td>
+                                <td>\(\longleftrightarrow\)</td>
+                                <td>\(\geqslant\)</td>
+                            </tr>
+                            <tr>
+                                <td>No restr.</td>
+                                <td>\(\longleftrightarrow\)</td>
+                                <td>\(=\)</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="3"><strong>Restricciones</strong></td>
+                                <td>\(\geqslant\)</td>
+                                <td>\(\longleftrightarrow\)</td>
+                                <td>\(\geqslant 0\)</td>
+                                <td rowspan="3"><strong>Variables</strong></td>
+                            </tr>
+                            <tr>
+                                <td>\(\leqslant\)</td>
+                                <td>\(\longleftrightarrow\)</td>
+                                <td>\(\leqslant 0\)</td>
+                            </tr>
+                            <tr>
+                                <td>\(=\)</td>
+                                <td>\(\longleftrightarrow\)</td>
+                                <td>No restr.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- SUBCONTENIDO: EJEMPLO DUAL -->
+            <div id="ejemplo-dual" class="sub-tab-content">
+                <h4>Ejemplo de Problema Primal-Dual</h4>
+                
+                <div class="boxed highlight-strong">
+                    <h5>Primal</h5>
+                    <p>Min \(z_P = -x_1 - x_2\)</p>
+                    <p>sujeto a:</p>
+                    \[
+                    \begin{aligned}
+                            &x_1 - x_2 \geq 1 \\
+                        &-x_1 + x_2 \geq 1 \\
+                        &x_1, x_2 \geq 0
+                    \end{aligned}
+                    \]
+                    
+                    <h5>Dual</h5>
+                    <p>Max \(z_D = \omega_1 + \omega_2\)</p>
+                    <p>sujeto a:</p>
+                    \[
+                    \begin{aligned}
+                        &\omega_1 - \omega_2 \leq -1 \\
+                        &-\omega_1 + \omega_2 \leq -1 \\
+                        &\omega_1, \omega_2 \geq 0
+                    \end{aligned}
+                    \]
+                </div>
+            </div>
+            
+            <!-- SUBCONTENIDO: PROPIEDADES -->
+            <div id="propiedades" class="sub-tab-content">
+                <h4>Propiedades de la Dualidad</h4>
+                
+                <div class="boxed">
+                    <h5>Proposición</h5>
+                    <p>El dual del dual coincide con el primal.</p>
+                    
+                    <button id="btn-demostracion-dual" class="step-button">Ver demostración paso a paso</button>
+                    
+                    <div id="demostracion-dual-steps" class="step-container">
+                        <div class="step">
+                            <h6>Demostración</h6>
+                            <p>Sea el dual de un problema de programación lineal en forma estándar, es decir:</p>
+                            \[
+                            \begin{aligned}
+                                \max \quad & \lambda^T b \\
+                                \text{sujeto a} \quad & \lambda^T A \leq c^T
+                            \end{aligned}
+                            \]
+                            <p>Se expresa de forma equivalente:</p>
+                            \[
+                            \begin{aligned}
+                                -\min \quad & -b^T(u - v) \\
+                                \text{sujeto a} \quad & -A^T(u - v) \geq -c \\
+                                & u \geq 0, \quad v \geq 0
+                            \end{aligned}
+                            \]
+                            <p>donde hemos considerado que \(\lambda = u - v\).</p>
+                        </div>
+                        
+                        <div class="step">
+                            <p>Además, podemos expresar:</p>
+                            \[
+                            \begin{aligned}
+                                -b^T(u - v) &=\begin{pmatrix}
+                                    -b^T & b^T
+                                \end{pmatrix}\begin{pmatrix}
+                                    u \\
+                                    v
+                                \end{pmatrix}\\
+                                y \\
+                                -A^T(u - v) &= \begin{pmatrix}
+                                    -A^T & A^T
+                                \end{pmatrix}\begin{pmatrix}
+                                    u \\
+                                    v
+                                \end{pmatrix}
+                            \end{aligned}
+                            \]
+                        </div>
+                        
+                        <div class="step">
+                            <p>Entonces, el dual correspondiente es:</p>
+                            \[
+                            \begin{aligned}
+                                -\max \quad & -y^T c \\
+                                \text{sujeto a} \quad & y^T(-A^T, A^T) \leq (-b^T, b^T) \\
+                                & y \geq 0
+                            \end{aligned}
+                            \]
+                            <p>que a su vez es equivalente a:</p>
+                            \[
+                            \begin{aligned}
+                                \min \quad & c^T y \\
+                                \text{sujeto a} \quad & A y = b \\
+                                & y \geq 0
+                            \end{aligned}
+                            \]
+                            <p>que efectivamente coincide con el primal en su forma estándar. \(\blacksquare\)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="boxed">
+                    <p>Para facilitar la exposición, presentaremos siempre el problema primal como un problema de minimización y el dual como un problema de maximización.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTENIDO DE EJEMPLOS -->
+        <section id="ejemplos" class="tab-content">
+            <h3>Ejemplos de Problemas de Programación Lineal</h3>
+            
+            <div class="sub-tabs">
+                <button class="sub-tab-button active" data-subtab="dieta">Problema de la Dieta</button>
+                <button class="sub-tab-button" data-subtab="mochila">Problema de la Mochila</button>
+                <button class="sub-tab-button" data-subtab="localizacion">Problemas de Localización</button>
+            </div>
+            
+            <!-- SUBCONTENIDO: DIETA -->
+            <div id="dieta" class="sub-tab-content active">
+                <h4>Problema de la Dieta</h4>
+                
+                <div class="boxed">
+                    <p>Una de las primeras aplicaciones conocidas del algoritmo del Simplex fue la determinación de una dieta adecuada que fuera de menor coste. El problema de la dieta consiste en determinar la dieta más económica que satisfaga las necesidades nutritivas mínimas básicas para una persona o un grupo de personas.</p>
+                </div>
+                
+                <div class="boxed">
+                    <h5>Formulación del Problema</h5>
+                    <p>Supongamos que disponemos de \( n \) alimentos distintos con un precio \( c_i \) la unidad del alimento \( i \)-ésimo. Además, hay \( m \) ingredientes nutritivos básicos y, para conseguir una dieta equilibrada, cada persona debe recibir al menos \( b_j \) unidades del \( j \)-ésimo elemento nutritivo por día. Finalmente, se supone que cada unidad del alimento \( i \) contiene \( a_{ij} \) unidades del \( j \)-ésimo elemento nutritivo. Entonces, denominamos \( x_i \) al número de unidades del alimento \( i \) de la dieta. El problema consistirá en seleccionar las \( x_i \) para minimizar el coste total.</p>
+                    
+                    <p>Esto es:</p>
+                    
+                    <p>Sea,</p>
+                    \[
+                    \begin{aligned}
+                        &a_{ij} = \text{Cantidad del nutriente } j \text{ en el alimento } i, \text{ para } j \in \{1, \ldots, m\}, i \in \{1, \ldots, n\} \\
+                        &b_j = \text{Cantidad necesaria del nutriente } j, \text{ para } j \in \{1, \ldots, m\} \\
+                        &c_i = \text{Coste unitario del alimento } i, \text{ para } i \in \{1, \ldots, n\} \\
+                        &x_i = \text{número de unidades del alimento } i, \text{ para } i \in \{1, \ldots, n\}
+                    \end{aligned}
+                    \]
+                    
+                    <p>Entonces el problema a resolver se corresponde con el programa lineal:</p>
+                    \[
+                    \text{minimizar } c_1 x_1 + c_2 x_2 + \ldots + c_n x_n
+                    \]
+                    <p>sujeto a</p>
+                    \[
+                    \begin{aligned}
+                        &a_{11} x_1 + a_{12} x_2 + \ldots + a_{1n} x_n \geq b_1 \\
+                        &a_{21} x_1 + a_{22} x_2 + \ldots + a_{2n} x_n \geq b_2 \\
+                        &\ldots \\
+                        &a_{m1} x_1 + a_{m2} x_2 + \ldots + a_{mn} x_n \geq b_m \\
+                        &x_i \geq 0, \quad i \in \{1, \ldots, n\}
+                    \end{aligned}
+                    \]
+                </div>
+                
+                <div class="boxed">
+                    <h5>Interpretación del Dual</h5>
+                    <p>El problema de la dieta tiene su particular interpretación en el dual. Si consideramos el problema que acabamos de describir como el primal, es decir, con las restricciones \( Ax \geq b \) y \( x \geq 0 \), el dual de este problema sería:</p>
+                    \[
+                    \begin{aligned}
+                        &\text{maximizar } \lambda^T b \\
+                        &\text{sujeto a } \lambda^T A \leq c^T \\
+                        &\lambda \geq 0.
+                    \end{aligned}
+                    \]
+                    
+                    <p>Este problema se corresponde, por ejemplo, en el caso en que un farmacéutico que dispone de \( m \) complementos vitamínicos distintos y una cantidad \( b_j \) de cada complemento.</p>
+                    
+                    <p>El precio unitario del nutriente \( j \) es \( \lambda_j \). El farmacéutico quiere maximizar los beneficios asociados a la venta de complementos vitamínicos, pero debe asegurarse de que los precios sean competitivos con los de los alimentos que contienen el nutriente.</p>
+                    
+                    <p>Es decir, para cada alimento \( i \), el precio en complementos vitamínicos de sus nutrientes,</p>
+                    \[
+                    \sum_{j=1}^{m} \lambda_j a_{ji}
+                    \]
+                    <p>no puede ser superior al coste del alimento, \( c_i \).</p>
+                </div>
+            </div>
+            
+            <!-- SUBCONTENIDO: MOCHILA -->
+            <div id="mochila" class="sub-tab-content">
+                <h4>El Problema de la Mochila</h4>
+                
+                <div class="boxed">
+                    <p><strong>Es un ejemplo de programación entera</strong></p>
+                    
+                    <p>El problema de la mochila se puede formular como sigue:</p>
+                    
+                    <p>Un excursionista debe decidir qué cosas incluir en su mochila. Tiene \( n \) objetos entre los que elegir y cada objeto tiene un peso \( p_j \) y una utilidad \( u_j \). El excursionista quiere maximizar la utilidad de la mochila que se encuentra sujeta a una restricción, el peso de la mochila \( P \geq 0 \).</p>
+                </div>
+                
+                <div class="boxed highlight-strong">
+                    <h5>Formulación Matemática</h5>
+                    \[
+                    \begin{aligned}
+                        \text{maximizar} \quad & \sum_{j=1}^{n} u_j x_j \\
+                        \text{sujeto a} \quad & \sum_{j=1}^{n} p_j x_j \leq P \\
+                        & x \in \{0, 1\}^n
+                    \end{aligned}
+                    \]
+                    <p>Donde \( x_j \) es una variable binaria que indica si el objeto entra en la mochila o no.</p>
+                </div>
+            </div>
+            
+            <!-- SUBCONTENIDO: LOCALIZACIÓN -->
+            <div id="localizacion" class="sub-tab-content">
+                <h4>Problemas de Localización</h4>
+                
+                <div class="boxed">
+                    <p>Uno de los problemas clásicos de la <strong>programación entera</strong> es el problema de localización. Su desarrollo a lo largo del tiempo ha sido tal que existen múltiples versiones de este problema. Presentamos a continuación un ejemplo.</p>
+                    
+                    <p>Supongamos que disponemos de una empresa con \( m \) potenciales ubicaciones distintas en donde situar un almacén de distribución para atender las demandas de \( n \) clientes.</p>
+                    
+                    <p>El problema que se plantea es decidir qué almacenes deberían abrirse y qué cantidad de mercancías se deben enviar desde cada almacén a cada cliente.</p>
+                </div>
+                
+                <div class="boxed">
+                    <h5>Variables del Problema</h5>
+                    
+                    <p>Usando las variables binarias, tenemos:</p>
+                    \[ y_j = \begin{cases} 1 & \text{si se abre el almacén de distribución } j \\ 0 & \text{si no se abre el almacén de distribución } j \end{cases} \]
+                    
+                    <p>Por otro lado, \( x_{ij} \) denota la cantidad de mercancías enviadas del almacén \( i \) al cliente \( j \), \( c_{ij} \) es el coste asociado a enviar una unidad de mercancía de \( i \) a \( j \), y \( f_i \) el coste fijo por abrir el almacén \( i \).</p>
+                    
+                    <p>Además, se debe tener en cuenta que para cada cliente \( j \), su demanda \( d_j \) debe ser realizada y no se pueden hacer envíos desde almacenes no abiertos.</p>
+                </div>
+                
+                <div class="boxed highlight-strong">
+                    <h5>Formulación del Problema</h5>
+                    \[
+                    \begin{aligned}
+                        \text{minimizar} \quad & \sum_{i=1}^{m} \sum_{j=1}^{n} c_{ij} x_{ij} + \sum_{i=1}^{m} f_i y_i \\
+                        \text{sujeto a} \quad & \sum_{i=1}^{m} x_{ij} = d_j, \quad j \in \{1, \ldots, n\} \\
+                        & \sum_{j=1}^{n} x_{ij} - y_i \cdot \sum_{j=1}^{n} d_j \leq 0, \quad i \in \{1, \ldots, m\} \\
+                        & x_{ij} \geq 0, \quad i \in \{1, \ldots, m\}, j \in \{1, \ldots, n\} \\
+                        & y_i \in \{0, 1\}, \quad i \in \{1, \ldots, m\}
+                    \end{aligned}
+                    \]
+                </div>
+                
+                <div class="boxed">
+                    <h5>Interpretación de las Restricciones</h5>
+                    
+                    <p>La función objetivo a minimizar contempla tanto los costes fijos asociados a los almacenes abiertos como los costes de transporte entre almacén y cliente. Con la restricción \(\sum_{i=1}^{m} x_{ij} = d_j\), se impone la demanda del cliente \(d_j\). Veamos ahora qué pasa con las variables binarias:</p>
+                    
+                    <ul>
+                        <li>Si \(y_i = 0\), el almacén \(i\) no abre, y entonces \(\sum_{j=1}^{n} x_{ij} \leqslant 0\), es decir, no se envía nada desde el almacén \(i\).</li>
+                        <li>Si \(y_i = 1\), la restricción establece que desde el almacén \(i\) no se enviarán más que la suma de todas las demandas.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTENIDO DE CONCLUSIÓN -->
+        <section id="conclusion" class="tab-content">
+            <h3>Conclusión</h3>
+            
+            <div class="boxed">
+                <p>La programación lineal es una herramienta matemática fundamental que se enseña en el bachillerato, ya que proporciona un marco estructurado para abordar problemas de optimización en una variedad de contextos.</p>
+                
+                <p>A través del estudio de la programación lineal, los estudiantes no solo desarrollan habilidades de resolución de problemas y pensamiento analítico, sino que también adquieren una comprensión más profunda de cómo utilizar las matemáticas para tomar decisiones óptimas en situaciones del mundo real, destacando la conexión entre la teoría y la práctica.</p>
+            </div>
+            
+            <div class="boxed">
+                <p>La comprensión profunda de la naturaleza algebraica de estos problemas ha conducido al desarrollo de métodos altamente eficientes, como el método del símplex.</p>
+                
+                <p>Este método sigue siendo fundamental hoy en día debido a su utilidad y la información adicional que proporciona sobre las soluciones. Además, el símplex ha permitido demostrar teoremas importantes, como el de dualidad fuerte y el de las holguras complementarias, así como realizar análisis de sensibilidad para comprender cómo afectan las variaciones en los problemas de programación lineal.</p>
+            </div>
+            
+            <div class="boxed highlight-strong">
+                <p>La importancia del método del símplex se extiende a la programación entera, donde técnicas como Branch and Bound se basan en resolver versiones relajadas de los problemas originales. El trabajo establece una base rigurosa de conocimientos sobre programación lineal y entera, que puede servir como punto de partida para futuras investigaciones teóricas o aplicaciones prácticas.</p>
+                
+                <p>En resumen, el estudio de la programación lineal en la educación no solo fomenta el pensamiento crítico, sino que también proporciona una base sólida para el éxito futuro en campos relacionados con las matemáticas y la toma de decisiones.</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Gestión de pestañas principales
+        document.addEventListener("DOMContentLoaded", function () {
+          const tabButtons = document.querySelectorAll(".tab-button");
+          const tabContents = document.querySelectorAll(".tab-content");
+
+          tabButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const targetId = btn.getAttribute("data-tab");
+              tabButtons.forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              tabContents.forEach((sec) => {
+                if (sec.id === targetId) sec.classList.add("active");
+                else sec.classList.remove("active");
+              });
+              if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise();
+            });
+          });
+
+          // Gestión de subpestañas
+          const subTabButtons = document.querySelectorAll(".sub-tab-button");
+          const subTabContents = document.querySelectorAll(".sub-tab-content");
+
+          subTabButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const parentTab = btn.closest('.tab-content');
+              const targetId = btn.getAttribute("data-subtab");
+              
+              // Solo desactivar botones dentro del mismo tab-content
+              parentTab.querySelectorAll(".sub-tab-button").forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              
+              // Solo desactivar contenidos dentro del mismo tab-content
+              parentTab.querySelectorAll(".sub-tab-content").forEach((sec) => {
+                if (sec.id === targetId) sec.classList.add("active");
+                else sec.classList.remove("active");
+              });
+              if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise();
+            });
+          });
+
+          // Resaltado progresivo demostración dual
+          const btnDemostracionDual = document.getElementById("btn-demostracion-dual");
+          const stepsContainerDual = document.getElementById("demostracion-dual-steps");
+          const stepsDual = stepsContainerDual ? stepsContainerDual.querySelectorAll(".step") : [];
+          let currentStepDual = -1;
+
+          function showNextStepDual() {
+            if (!stepsDual.length) return;
+            if (currentStepDual < stepsDual.length - 1) {
+              currentStepDual++;
+              stepsDual[currentStepDual].classList.add("visible");
+              btnDemostracionDual.textContent =
+                currentStepDual < stepsDual.length - 1 ? "Siguiente paso" : "Reiniciar demostración";
+              if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise();
+            } else {
+              // Reiniciar todo
+              stepsDual.forEach((st) => st.classList.remove("visible"));
+              currentStepDual = -1;
+              btnDemostracionDual.textContent = "Ver demostración paso a paso";
+            }
+          }
+
+          if (btnDemostracionDual) btnDemostracionDual.addEventListener("click", showNextStepDual);
+        });
+    </script>
+</body>
+</html>
