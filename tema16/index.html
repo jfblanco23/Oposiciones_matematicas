@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tema 16 - Sistemas de Ecuaciones Lineales</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+    <style>
+        :root {
+            --color-primary: #008080;
+            --color-bg: #FDFBD4;
+            --color-accent: #05472A;
+            --color-yellow: #fff8a6;
+            --color-text: #222222;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.7;
+            padding: 1.5rem 1rem;
+            font-size: 1.24rem;
+            margin: 0;
+        }
+        .main-header {
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+        }
+        .main-header h1 {
+            font-size: 2.1rem;
+            letter-spacing: 0.09em;
+            margin-bottom: 0.5rem;
+        }
+        .main-header h2 {
+            font-size: 1.06rem;
+            font-weight: 400;
+        }
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .postit-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        .postit-card {
+            background: linear-gradient(
+                135deg,
+                #fff8a6 0%,
+                #ffe155 50%,
+                #ffd700 100%
+            );
+            border: 3px solid #f4b400;
+            border-radius: 12px;
+            padding: 1.8rem 1.5rem;
+            box-shadow: 0 8px 20px rgba(244, 180, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            position: relative;
+            transform: rotate(-1deg);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--color-text);
+            font-weight: 600;
+            font-size: 1.12em;
+            line-height: 1.4;
+        }
+        .postit-card:nth-child(even) {
+            transform: rotate(1deg);
+        }
+        .postit-card:nth-child(3n) {
+            transform: rotate(-0.5deg);
+        }
+        .postit-card:hover {
+            transform: translateY(-8px) rotate(0deg) scale(1.02);
+            box-shadow: 0 15px 30px rgba(244, 180, 0, 0.4);
+            background: linear-gradient(
+                135deg,
+                #fff176 0%,
+                #ffecb3 50%,
+                #ffe082 100%
+            );
+        }
+        .postit-card::before {
+            content: "";
+            position: absolute;
+            top: -8px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            background: #f4b400;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-20deg);
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .postit-card::after {
+            content: "📌";
+            position: absolute;
+            top: -5px;
+            right: 18px;
+            font-size: 1.4em;
+            z-index: 2;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 0.6rem;
+                font-size: 1.07rem;
+            }
+            .main-header {
+                padding: 1rem;
+            }
+            .main-header h1 {
+                font-size: 1.23rem;
+            }
+            .main-header h2 {
+                font-size: 0.93rem;
+            }
+            .postit-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .postit-card {
+                transform: none !important;
+                padding: 1.5rem 1.2rem;
+            }
+        }
+        .info-section {
+            background-color: rgb(255 255 255 / 0.92);
+            border-radius: 0.85rem;
+            padding: 1.82rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.09);
+            margin-bottom: 1.7rem;
+            text-align: center;
+        }
+        .info-section h3 {
+            color: var(--color-accent);
+            margin-bottom: 1rem;
+            font-size: 1.4em;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <h1>Tema 16</h1>
+        <h2>Discusión y Resolución de Sistemas de Ecuaciones Lineales</h2>
+        <h2>Teorema de Rouché, Regla de Cramer, Método de Gauss-Jordan</h2>
+    </header>
+    <main>
+        <div class="info-section">
+            <h3>🌟 Navegación por temas</h3>
+            <p>Haz clic en cada post-it para ver cada sección del tema.</p>
+        </div>
+        <div class="postit-container">
+            <a href="https://jfblanco23.github.io/Oposiciones_matematicas/tema16/a/index.html" target="_blank" class="postit-card">
+                🧮 Introducción<br />
+                Tipos de sistemas, matrices y rango
+            </a>
+            <a href="https://jfblanco23.github.io/Oposiciones_matematicas/tema16/b/index.html" target="_blank" class="postit-card">
+                ➗ Método de eliminación de Gauss
+            </a>
+            <a href="https://jfblanco23.github.io/Oposiciones_matematicas/tema16/c/index.html" target="_blank" class="postit-card">
+                🔄 Método de Gauss-Jordan
+            </a>
+            <a href="https://jfblanco23.github.io/Oposiciones_matematicas/tema16/d/tema16d.html" target="_blank" class="postit-card">
+                📏 Regla de Cramer
+            </a>
+        </div>
+    </main>
+</body>
+</html>
