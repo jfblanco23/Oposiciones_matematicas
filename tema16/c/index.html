@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Método Gauss-Jordan y Pivoteo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [["\\(", "\\)"]],
+        displayMath: [["\\[", "\\]"]],
+        processEscapes: true,
+        packages: ['base', 'ams']
+      },
+      options: {
+        skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="main-header">
+    <h1>Método de Gauss-Jordan</h1>
+    <h2>Sistemas de ecuaciones lineales: Algoritmo y Pivoteo</h2>
+  </header>
+  <nav class="tabs">
+    <button class="tab-button active" data-tab="gaussj">Gauss-Jordan</button>
+    <button class="tab-button" data-tab="pivoteo">Pivoteo</button>
+  </nav>
+  <main>
+    <!-- Método Gauss-Jordan -->
+    <section id="gaussj" class="tab-content active">
+      <div class="boxed"><h3>Método de Gauss-Jordan</h3></div>
+      <p>
+        Dado el sistema \(AX = b\), si \(A\) es una matriz cuadrada con \(A \neq 0\), el método de Gauss puede ser completado triangulando también la parte superior, convirtiendo así a la matriz \(A\) en una matriz diagonal. Esta variante se conoce con el nombre de Método de Gauss-Jordan, y consiste en convertir a cero todos los elementos de matriz \(A\) menos los de diagonal principal.
+      </p>
+      <p>Dado el sistema \(AX = b\), se transforma la matriz:</p>
+      <p class="math-block">\[
+      \begin{pmatrix}
+      a_{11} & a_{12} & \cdots & a_{1n} & b_{1} \\
+      a_{21} & a_{22} & \cdots & a_{2n} & b_{2} \\
+      \vdots & \vdots & \ddots & \vdots & \vdots \\
+      a_{n1} & a_{n2} & \cdots & a_{nn} & b_{n} \\
+      \end{pmatrix}
+      \]</p>
+      <p>Por el método de Gauss en:</p>
+      <p class="math-block">\[
+      \begin{pmatrix}
+      t_{11} & t_{12} & \cdots & t_{1n} & c_{1} \\
+      0 & t_{22} & \cdots & t_{2n} & c_{2} \\
+      \vdots & \vdots & \ddots & \vdots & \vdots \\
+      0 & 0 & \cdots & t_{nn} & c_{n} \\
+      \end{pmatrix}
+      \]</p>
+      <p>Obteniéndose el sistema \(TX = C\).</p>
+      <h4>Eliminación por encima</h4>
+      <ul>
+        <li>
+          <b>Primer paso:</b> Se consiguen ceros en la columna de la matriz \((T|C)\) por encima de la diagonal principal, transformando cada ecuación \(E_i\) en \(E'_i\) mediante
+          <span class="math-block">\[
+          E'_i = E_i - \frac{t_{in}}{t_{nn}}E_n, \quad 1 \leq i \leq n - 1
+          \]</span>
+        </li>
+        <li>
+          <b>Paso K:</b> Ceros en la columna \(n-K+1\) por encima de la diagonal, partiendo del sistema del paso anterior:
+          <span class="math-block">\[
+          E_i^{k}=E_i^{k-1},   \quad n-k+1 \leq i \leq n
+          \]
+          \[
+          E_i^{k} = E_i^{k-1} - \frac{t_{i(n-K+1)}^{k-1}}{t_{(n-K+1)(n-K+1)}^{k-1}}E_{n-K+1}^{k-1}, \quad 1 \leq i \leq n
+          \]</span>
+        </li>
+      </ul>
+      <p>En a lo sumo \(n-1\) pasos alcanzamos:</p>
+      <p class="math-block">\[
+      \left(\begin{array}{cccc|c}
+      d_{11} & 0 & \cdots & 0 & p_{1} \\
+      0 & d_{22} & \cdots & 0 & p_{2} \\
+      \vdots & \vdots & \ddots & \vdots & \vdots \\
+      0 & 0 & \cdots & d_{nn} & p_{n}
+      \end{array}\right)
+      \]</p>
+      <p>
+        Obteniéndose de forma trivial la solución como \(x_j = \frac{p_j}{d_{jj}}, \ 1 \leq j \leq n\).
+      </p>
+    </section>
+    <!-- Método de Gauss con Pivoteo Parcial y Total -->
+    <section id="pivoteo" class="tab-content">
+      <div class="boxed highlight-strong">
+        <h3>Método de Gauss con Pivoteo Parcial y Total</h3>
+      </div>
+      <p>
+        Cuando un proceso matemático no está definido para un valor particular de un parámetro, es muy posible que el proceso funcione numéricamente mal cerca de ese valor. El siguiente ejemplo ilustra las consecuencias de operar con un pivote pequeño.
+      </p>
+      <h4>Ejemplo</h4>
+      <p>
+        Por eliminación gaussiana y trabajando con dos y cuatro cifras respectivamente, resolver el sistema de ecuaciones:
+      </p>
+      <p class="math-block">\[
+      \begin{cases}
+      0.0001x + y = 1 \\
+      x + y = 2
+      \end{cases}
+      \]</p>
+      <p>
+        Este ejemplo prueba que la aparición de un pivote pequeño puede ser el anuncio de un desastre computacional. Por ello debemos modificar el método de eliminación de Gauss para evitar pivotes pequeños intercambiando las filas y las columnas de la matriz \( A \).
+      </p>
+      <ul>
+        <li>
+          <strong>Eliminación gaussiana con pivoteo total:</strong>
+          <br>
+          Si en la etapa \( r \)-ésima del proceso de eliminación el pivote \( a_{rr} \) es demasiado pequeño, elegimos el elemento \( a_{pq} = \max \left\{ |a_{ij}| : i, j \geq r \right\} \) como nuevo pivote.<br>
+          Para ello intercambiamos las filas \( r \) y \( p \) y las columnas \( r \) y \( q \) de forma que situamos el elemento \( a_{pq} \) en la posición \( (r,r) \). Posteriormente continuamos la eliminación con el nuevo pivote.
+        </li>
+        <li>
+          <strong>Eliminación gaussiana con pivote parcial:</strong>
+          <br>
+          En este caso la alternativa consiste en buscar solamente en la \( r \)-ésima columna; es decir, tomar \( a_{pr} = \max \left\{ |a_{ir}| : i\geq r \right\} \) como nuevo pivote. <br>
+          Para ello intercambiamos las filas \( r \) y \( p \), continuando posteriormente el proceso de eliminación.
+        </li>
+      </ul>
+      <p>
+        En la práctica, el método de Gauss con pivoteo total puede consumir mucho tiempo, computacionalmente hablando, pues para hallar el máximo en cada paso hay que buscar entre \( (m - r + 1) \cdot (n - r + 1) \) elementos. En el otro caso, además del ahorro de tiempo, las incógnitas de nuestro sistema no cambian de orden en el sistema reducido. Por ello, en general, es suficiente utilizar un pivoteo parcial.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
