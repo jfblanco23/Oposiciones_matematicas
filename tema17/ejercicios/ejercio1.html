@@ -1,0 +1,861 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Discusión del Sistema Lineal (MathTeX)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #ffffff;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .container {
+      width: 1500px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* Sidebar con pestañas principales */
+    .tabs-main {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      padding: 0 20px;
+    }
+
+    .tab-main {
+      padding: 18px 32px;
+      text-decoration: none;
+      color: #444;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-bottom: 3px solid transparent;
+      margin-right: 8px;
+    }
+
+    .tab-main:hover {
+      background-color: #e8f5f0;
+      color: #0d8c5a;
+    }
+
+    .tab-main.active {
+      color: #0d8c5a;
+      border-bottom: 3px solid #0d8c5a;
+      background-color: #f0f9f4;
+    }
+
+    /* Contenido principal */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px;
+      background-color: #ffffff;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Subpestañas (dentro de cada sección) */
+    .subtabs {
+      display: flex;
+      margin: 20px 0 25px;
+      gap: 6px;
+    }
+
+    .subtab {
+      padding: 10px 20px;
+      background: #f1f8f5;
+      border: 1px solid #cce8db;
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      font-weight: 500;
+      color: #0d8c5a;
+      transition: all 0.2s;
+    }
+
+    .subtab:hover {
+      background: #d9f0e6;
+    }
+
+    .subtab.active {
+      background: #0d8c5a;
+      color: white;
+      border-color: #0a6642;
+    }
+
+    /* MyBox styles */
+    .mybox {
+      background-color: #f0f9f4;
+      border-left: 5px solid #0d8c5a;
+      padding: 18px 22px;
+      margin: 25px 0 20px;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .mybox h1, .mybox h2 {
+      color: #0d8c5a;
+      margin: 0;
+    }
+
+    /* Math blocks */
+    .math {
+      background: #ffffff;
+      padding: 18px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border: 1px solid #eaeaea;
+      overflow-x: auto;
+      font-size: 1.1em;
+    }
+
+    /* Steps dentro de subsecciones */
+    .step {
+      display: none;
+      margin-bottom: 30px;
+      transition: all 0.5s ease;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    .step.highlight {
+      position: relative;
+      animation: highlight 0.8s ease;
+      background-color: #fff8a6;
+      box-shadow: 0 0 10px 2px #ffe066cc;
+      border-radius: 10px;
+      padding: 15px;
+      z-index: 10;
+    }
+
+    .step.highlight::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(to right, rgba(255, 235, 59, 0.4), rgba(255, 193, 7, 0.6));
+      border-radius: 4px;
+      z-index: -1;
+    }
+
+    @keyframes highlight {
+      0% {
+        background-color: rgba(255, 235, 59, 0.4);
+        transform: translateY(5px);
+      }
+      100% {
+        background-color: transparent;
+        transform: translateY(0);
+      }
+    }
+
+    /* Progress indicator */
+    .progress-indicator {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background-color: rgba(13, 140, 90, 0.9);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 1rem;
+      font-weight: 500;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+      z-index: 100;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container { width: 100%; }
+      .tab-main { padding: 14px 16px; font-size: 0.9rem; }
+      .content { padding: 15px; }
+      .math { padding: 14px; font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="tabs-main">
+      <div class="tab-main active" data-target="section-enunciado">Enunciado</div>
+      <div class="tab-main" data-target="section-desarrollo">Desarrollo del ejercicio</div>
+      <div class="tab-main" data-target="section-b0">Caso \( b = 0 \)</div>
+      <div class="tab-main" data-target="section-bne0">Caso \( b \ne 0 \)</div>
+      <div class="tab-main" data-target="section-resumen">Resumen Final</div>
+    </div>
+
+    <div class="content">
+      <!-- ENUNCIADO -->
+      <section id="section-enunciado" class="section active">
+        <div class="mybox"><h1>Enunciado del problema</h1></div>
+        <p>Discutir, según los valores de los parámetros \( a \) y \( b \), el siguiente sistema de ecuaciones lineales:</p>
+        <div class="math">\[
+        \left\{
+        \begin{aligned}
+        a x + b y + z &= 1 \\
+        x + a b y + z &= b \\
+        x + b y + a z &= 1
+        \end{aligned}
+        \right.
+        \]</div>
+        <p>Es decir, determinar para qué valores de \( a \) y \( b \) el sistema es:</p>
+        <ul>
+          <li><strong>Compatible determinado</strong> (solución única),</li>
+          <li><strong>Compatible indeterminado</strong> (infinitas soluciones),</li>
+          <li><strong>Incompatible</strong> (sin solución).</li>
+        </ul>
+        <p>Se utilizará el teorema de Rouché–Fröbenius, estudiando los rangos de la matriz de coeficientes \( A \) y la matriz ampliada \( (A \mid \vec{b}) \).</p>
+      </section>
+
+      <!-- DESARROLLO -->
+      <section id="section-desarrollo" class="section">
+        <div class="mybox"><h1>Desarrollo del ejercicio</h1></div>
+
+        <h2>Paso 1: Matriz de coeficientes y matriz ampliada</h2>
+        <p>La matriz de coeficientes es:</p>
+        <div class="math">\[
+        A = \left(
+        \begin{array}{ccc}
+        a & b & 1 \\
+        1 & ab & 1 \\
+        1 & b & a
+        \end{array}
+        \right)
+        \]</div>
+        <p>y la matriz ampliada es:</p>
+        <div class="math">\[
+        (A \mid \vec{b}) = \left(
+        \begin{array}{ccc|c}
+        a & b & 1 & 1 \\
+        1 & ab & 1 & b \\
+        1 & b & a & 1
+        \end{array}
+        \right)
+        \]</div>
+
+        <h2>Paso 2: Cálculo del determinante de \( A \)</h2>
+        <p>Calculemos el determinante de \( A \):</p>
+        <div class="math">\[
+        \left|
+        \begin{array}{ccc}
+        a & b & 1 \\
+        1 & ab & 1 \\
+        1 & b & a
+        \end{array}
+        \right|
+        \]</div>
+        <p>Desarrollamos por la primera fila:</p>
+        <div class="math">\[
+        = a \cdot 
+        \left|
+        \begin{array}{cc}
+        ab & 1 \\
+        b & a
+        \end{array}
+        \right|
+        - b \cdot 
+        \left|
+        \begin{array}{cc}
+        1 & 1 \\
+        1 & a
+        \end{array}
+        \right|
+        + 1 \cdot 
+        \left|
+        \begin{array}{cc}
+        1 & ab \\
+        1 & b
+        \end{array}
+        \right|
+        \]</div>
+        <p>Calculamos cada menor:</p>
+        <div class="math">\[
+        \begin{aligned}
+        \left|
+        \begin{array}{cc}
+        ab & 1 \\
+        b & a
+        \end{array}
+        \right|
+        &= (ab)(a) - (1)(b) = a^{2}b - b \\
+        \left|
+        \begin{array}{cc}
+        1 & 1 \\
+        1 & a
+        \end{array}
+        \right|
+        &= (1)(a) - (1)(1) = a - 1 \\
+        \left|
+        \begin{array}{cc}
+        1 & ab \\
+        1 & b
+        \end{array}
+        \right|
+        &= (1)(b) - (ab)(1) = b - ab
+        \end{aligned}
+        \]</div>
+        <p>Sustituyendo:</p>
+        <div class="math">\[
+        \left|
+        \begin{array}{ccc}
+        a & b & 1 \\
+        1 & ab & 1 \\
+        1 & b & a
+        \end{array}
+        \right|
+        = a(a^{2}b - b) - b(a - 1) + (b - ab)
+        \]</div>
+        <p>Simplificamos término a término:</p>
+        <div class="math">\[
+        \begin{aligned}
+        &= a^{3}b - ab - ab + b + b - ab \\
+        &= a^{3}b - 3ab + 2b \\
+        &= b\left(a^{3} - 3a + 2\right)
+        \end{aligned}
+        \]</div>
+        <p>Factorizamos el polinomio en \( a \):</p>
+        <div class="math">\[
+        a^{3} - 3a + 2 = (a - 1)^{2}(a + 2)
+        \]</div>
+        <p>Por tanto:</p>
+        <div class="math">\[
+        \boxed{
+        \left|
+        \begin{array}{ccc}
+        a & b & 1 \\
+        1 & ab & 1 \\
+        1 & b & a
+        \end{array}
+        \right|
+        = b\,(a - 1)^{2}\,(a + 2)
+        }
+        \]</div>
+
+        <h2>Paso 3: Discusión según los valores de \( a \) y \( b \)</h2>
+        <p>El sistema es cuadrado (\( 3 \times 3 \)), por lo que aplicamos el teorema de Rouché–Fröbenius:</p>
+        <ul>
+          <li>Si \( 
+          \left|
+          \begin{array}{ccc}
+          a & b & 1 \\
+          1 & ab & 1 \\
+          1 & b & a
+          \end{array}
+          \right|
+          \ne 0 \), entonces \( \operatorname{rg}(A) = \operatorname{rg}(A \mid \vec{b}) = 3 \), y el sistema es <strong>compatible determinado</strong>.</li>
+          <li>Si \( 
+          \left|
+          \begin{array}{ccc}
+          a & b & 1 \\
+          1 & ab & 1 \\
+          1 & b & a
+          \end{array}
+          \right|
+          = 0 \), entonces \( \operatorname{rg}(A) < 3 \), y debemos estudiar \( \operatorname{rg}(A) \) y \( \operatorname{rg}(A \mid \vec{b}) \) para ver si son iguales (compatible indeterminado) o distintos (incompatible).</li>
+        </ul>
+        <p>Los casos críticos ocurren cuando \( b = 0 \), \( a = 1 \) o \( a = -2 \).</p>
+
+        <h3>Caso 1: \( 
+        \left|
+        \begin{array}{ccc}
+        a & b & 1 \\
+        1 & ab & 1 \\
+        1 & b & a
+        \end{array}
+        \right|
+        \ne 0 \iff b \ne 0 \land a \ne 1 \land a \ne -2 \)</h3>
+        <p>En este caso, \( \operatorname{rg}(A) = 3 \). Como \( A \) es cuadrada e invertible, \( \operatorname{rg}(A \mid \vec{b}) = 3 \) también. Por tanto, el sistema es <strong>compatible determinado</strong>.</p>
+      </section>
+
+      <!-- SECCIÓN 1: b = 0 -->
+      <section id="section-b0" class="section">
+        <div class="mybox"><h1>Caso \( b = 0 \)</h1></div>
+        <p>Al sustituir \( b = 0 \), el sistema queda:</p>
+        <div class="math">\[
+        \left\{
+        \begin{aligned}
+        a x + z &= 1 \\
+        x + z &= 0 \\
+        x + a z &= 1
+        \end{aligned}
+        \right.
+        \]</div>
+
+        <div class="subtabs">
+          <div class="subtab active" data-target="sub-b0-a1">\( a = 1 \)</div>
+          <div class="subtab" data-target="sub-b0-an1">\( a \ne 1 \)</div>
+        </div>
+
+        <!-- Subsección: a = 1 -->
+        <div id="sub-b0-a1" class="subsection active">
+          <div class="step">
+            <p>Sustituimos \( a = 1 \) en la matriz de coeficientes y ampliada:</p>
+            <div class="math">\[
+            A = \left(
+            \begin{array}{ccc}
+            1 & 0 & 1 \\
+            1 & 0 & 1 \\
+            1 & 0 & 1
+            \end{array}
+            \right), \quad
+            (A \mid \vec{b}) = \left(
+            \begin{array}{ccc|c}
+            1 & 0 & 1 & 1 \\
+            1 & 0 & 1 & 0 \\
+            1 & 0 & 1 & 1
+            \end{array}
+            \right)
+            \]</div>
+          </div>
+          <div class="step">
+            <p>Observamos que todas las filas de \( A \) son iguales ⇒ \( \operatorname{rg}(A) = 1 \).</p>
+          </div>
+          <div class="step">
+            <p>En la matriz ampliada, la segunda fila tiene distinto término independiente (\( 0 \) vs \( 1 \)), luego las filas no son proporcionales:</p>
+            <div class="math">\[
+            \operatorname{rg}(A \mid \vec{b}) = 2
+            \]</div>
+          </div>
+          <div class="step">
+            <p>Como \( \operatorname{rg}(A) = 1 \ne 2 = \operatorname{rg}(A \mid \vec{b}) \), el sistema es <strong>incompatible</strong>.</p>
+          </div>
+        </div>
+
+        <!-- Subsección: a ≠ 1 -->
+        <div id="sub-b0-an1" class="subsection" style="display:none;">
+          <div class="step">
+            <p>Estudiamos el rango mediante menores. Tomamos:</p>
+            <div class="math">\[
+            \left|
+            \begin{array}{cc}
+            a & 1 \\
+            1 & 1
+            \end{array}
+            \right|
+            = a - 1 \ne 0 \quad (\text{pues } a \ne 1)
+            \]</div>
+            <p>⇒ \( \operatorname{rg}(A) \ge 2 \). Como la segunda columna es nula, \( \det(A) = 0 \) ⇒ \( \operatorname{rg}(A) = 2 \).</p>
+          </div>
+          <div class="step">
+            <p>Estudiamos el rango de la ampliada con el menor de columnas 1, 3 y 4:</p>
+            <div class="math">\[
+            \left|
+            \begin{array}{ccc}
+            a & 1 & 1 \\
+            1 & 1 & 0 \\
+            1 & a & 1
+            \end{array}
+            \right|
+            = 2(a - 1) \ne 0
+            \]</div>
+            <p>⇒ \( \operatorname{rg}(A \mid \vec{b}) = 3 \).</p>
+          </div>
+          <div class="step">
+            <p>Como \( \operatorname{rg}(A) = 2 \ne 3 = \operatorname{rg}(A \mid \vec{b}) \), el sistema es <strong>incompatible</strong>.</p>
+          </div>
+          <div class="step">
+            <p>✅ <strong>Conclusión:</strong> Para \( b = 0 \), el sistema es incompatible para todo \( a \in \mathbb{R} \).</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 2: b ≠ 0 -->
+      <section id="section-bne0" class="section">
+        <div class="mybox"><h1>Caso \( b \ne 0 \)</h1></div>
+        <p>El determinante de la matriz de coeficientes es:</p>
+        <div class="math">\[
+        \left|
+        \begin{array}{ccc}
+        a & b & 1 \\
+        1 & ab & 1 \\
+        1 & b & a
+        \end{array}
+        \right|
+        = b(a-1)^2(a+2)
+        \]</div>
+
+        <div class="subtabs">
+          <div class="subtab active" data-target="sub-bne0-gen">\( a \ne -2,\, a \ne 1 \)</div>
+          <div class="subtab" data-target="sub-bne0-a-2">\( a = -2 \)</div>
+          <div class="subtab" data-target="sub-bne0-a1">\( a = 1 \)</div>
+        </div>
+
+        <!-- Subsección: a ≠ -2 y a ≠ 1 -->
+        <div id="sub-bne0-gen" class="subsection active">
+          <div class="step">
+            <p>Como \( b \ne 0 \), \( a \ne 1 \), \( a \ne -2 \), entonces:</p>
+            <div class="math">\[
+            \left|
+            \begin{array}{ccc}
+            a & b & 1 \\
+            1 & ab & 1 \\
+            1 & b & a
+            \end{array}
+            \right|
+            = b(a-1)^2(a+2) \ne 0
+            \]</div>
+          </div>
+          <div class="step">
+            <p>⇒ \( \operatorname{rg}(A) = 3 = \operatorname{rg}(A \mid \vec{b}) \).</p>
+            <p>El sistema es <strong>compatible determinado</strong>.</p>
+          </div>
+          <div class="step">
+            <p>La solución se obtiene por la regla de Cramer:</p>
+            <div class="math">\[
+            x = \dfrac{
+            \left|
+            \begin{array}{ccc}
+            1 & b & 1 \\
+            b & ab & 1 \\
+            1 & b & a
+            \end{array}
+            \right|
+            }{
+            \left|
+            \begin{array}{ccc}
+            a & b & 1 \\
+            1 & ab & 1 \\
+            1 & b & a
+            \end{array}
+            \right|
+            }, \quad
+            y = \dfrac{
+            \left|
+            \begin{array}{ccc}
+            a & 1 & 1 \\
+            1 & b & 1 \\
+            1 & 1 & a
+            \end{array}
+            \right|
+            }{
+            \left|
+            \begin{array}{ccc}
+            a & b & 1 \\
+            1 & ab & 1 \\
+            1 & b & a
+            \end{array}
+            \right|
+            }, \quad
+            z = \dfrac{
+            \left|
+            \begin{array}{ccc}
+            a & b & 1 \\
+            1 & ab & b \\
+            1 & b & 1
+            \end{array}
+            \right|
+            }{
+            \left|
+            \begin{array}{ccc}
+            a & b & 1 \\
+            1 & ab & 1 \\
+            1 & b & a
+            \end{array}
+            \right|
+            }
+            \]</div>
+          </div>
+        </div>
+
+        <!-- Subsección: a = -2 -->
+        <div id="sub-bne0-a-2" class="subsection" style="display:none;">
+          <div class="step">
+            <p>Con \( a = -2 \), \( b \ne 0 \):</p>
+            <div class="math">\[
+            A = \left(
+            \begin{array}{ccc}
+            -2 & b & 1 \\
+            1 & -2b & 1 \\
+            1 & b & -2
+            \end{array}
+            \right)
+            \]</div>
+          </div>
+          <div class="step">
+            <p>Menor de orden 2:</p>
+            <div class="math">\[
+            \left|
+            \begin{array}{cc}
+            -2 & b \\
+            1 & -2b
+            \end{array}
+            \right|
+            = (-2)(-2b) - (b)(1) = 4b - b = 3b \ne 0
+            \Rightarrow \operatorname{rg}(A) = 2
+            \]</div>
+          </div>
+          <div class="step">
+            <p>Menor ampliado (columnas 1, 2 y 4):</p>
+            <div class="math">\[
+            \left|
+            \begin{array}{ccc}
+            -2 & b & 1 \\
+            1 & -2b & b \\
+            1 & b & 1
+            \end{array}
+            \right|
+            = 3b(b + 2)
+            \]</div>
+          </div>
+          <div class="step">
+            <ul>
+              <li>Si \( b \ne -2 \): rango ampliado = 3 ⇒ <strong>incompatible</strong>.</li>
+              <li>Si \( b = -2 \): rango ampliado = 2 ⇒ <strong>compatible indeterminado</strong>.</li>
+            </ul>
+          </div>
+          <div class="step">
+            <p>Cuando \( a = -2 \), \( b = -2 \), la solución es:</p>
+            <div class="math">\[
+            \begin{cases}
+            x = -1 - \lambda \\
+            y = \lambda \\
+            z = -1 - 2\lambda
+            \end{cases}, \quad \lambda \in \mathbb{R}
+            \]</div>
+          </div>
+        </div>
+
+        <!-- Subsección: a = 1 -->
+        <div id="sub-bne0-a1" class="subsection" style="display:none;">
+          <div class="step">
+            <p>Con \( a = 1 \), \( b \ne 0 \):</p>
+            <div class="math">\[
+            A = \left(
+            \begin{array}{ccc}
+            1 & b & 1 \\
+            1 & b & 1 \\
+            1 & b & 1
+            \end{array}
+            \right), \quad
+            (A \mid \vec{b}) = \left(
+            \begin{array}{ccc|c}
+            1 & b & 1 & 1 \\
+            1 & b & 1 & b \\
+            1 & b & 1 & 1
+            \end{array}
+            \right)
+            \]</div>
+          </div>
+          <div class="step">
+            <p>\( \operatorname{rg}(A) = 1 \). Ahora:</p>
+            <ul>
+              <li>Si \( b \ne 1 \): \( \operatorname{rg}(A \mid \vec{b}) = 2 \) ⇒ <strong>incompatible</strong>.</li>
+              <li>Si \( b = 1 \): \( \operatorname{rg}(A \mid \vec{b}) = 1 \) ⇒ <strong>compatible indeterminado</strong>.</li>
+            </ul>
+          </div>
+          <div class="step">
+            <p>Cuando \( a = 1 \), \( b = 1 \), el sistema es:</p>
+            <div class="math">\[
+            x + y + z = 1
+            \]</div>
+            <p>Solución general:</p>
+            <div class="math">\[
+            \begin{cases}
+            x = \lambda \\
+            y = \mu \\
+            z = 1 - \lambda - \mu
+            \end{cases}, \quad \lambda, \mu \in \mathbb{R}
+            \]</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 3: Resumen -->
+      <section id="section-resumen" class="section">
+        <div class="mybox"><h1>Resumen Final</h1></div>
+        <div class="math">
+        \[
+        \begin{array}{|c|c|c|c|}
+        \hline
+        \text{Caso} & \operatorname{rg}(A) & \operatorname{rg}(A \mid \vec{b}) & \text{Clasificación} \\
+        \hline
+        b = 0 & \leq 2 & > \operatorname{rg}(A) & \text{Incompatible} \\
+        \hline
+        b \neq 0,\ a \neq 1,\ a \neq -2 & 3 & 3 & \text{Compatible determinado} \\
+        \hline
+        a = -2,\ b \neq -2 & 2 & 3 & \text{Incompatible} \\
+        \hline
+        a = -2,\ b = -2 & 2 & 2 & \text{Compatible indeterminado} \\
+        \hline
+        a = 1,\ b \neq 1 & 1 & 2 & \text{Incompatible} \\
+        \hline
+        a = 1,\ b = 1 & 1 & 1 & \text{Compatible indeterminado} \\
+        \hline
+        \end{array}
+        \]
+        \]</div>
+        <p style="margin-top:20px; font-weight:500; color:#0d8c5a;">
+          ✅ El sistema solo tiene solución cuando:
+          <br> • \( b \ne 0 \), \( a \ne 1 \), \( a \ne -2 \) → solución única.
+          <br> • \( (a,b) = (1,1) \) o \( (a,b) = (-2,-2) \) → infinitas soluciones.
+        </p>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [["\\(", "\\)"]],
+        displayMath: [["\\[", "\\]"]],
+        processEscapes: true,
+        packages: {'[+]': ['ams', 'newcommand']}
+      },
+      options: {
+        skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+      }
+    };
+  </script>
+  <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      let currentStep = 0;
+      let steps = [];
+      let progressIndicator = null;
+
+      const mainTabs = document.querySelectorAll('.tab-main');
+      const sections = document.querySelectorAll('.section');
+
+      mainTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const targetId = tab.getAttribute('data-target');
+          mainTabs.forEach(t => t.classList.remove('active'));
+          sections.forEach(s => s.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(targetId).classList.add('active');
+          if (targetId === 'section-b0' || targetId === 'section-bne0') {
+            initializeSubtabs(targetId);
+          } else {
+            removeProgressIndicator();
+          }
+        });
+      });
+
+      function initializeSubtabs(sectionId) {
+        const section = document.getElementById(sectionId);
+        const subtabs = section.querySelectorAll('.subtab');
+        const subsections = section.querySelectorAll('.subsection');
+
+        subtabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            const targetSub = tab.getAttribute('data-target');
+            subtabs.forEach(t => t.classList.remove('active'));
+            subsections.forEach(s => s.style.display = 'none');
+            tab.classList.add('active');
+            document.getElementById(targetSub).style.display = 'block';
+            initializeSteps(targetSub);
+          });
+        });
+
+        if (subtabs.length > 0 && subsections.length > 0) {
+          subtabs[0].classList.add('active');
+          subsections[0].style.display = 'block';
+          initializeSteps(subsections[0].id);
+        }
+      }
+
+      function initializeSteps(subsectionId) {
+        const subsection = document.getElementById(subsectionId);
+        steps = Array.from(subsection.querySelectorAll('.step'));
+        currentStep = 0;
+        steps.forEach((step, i) => {
+          step.classList.toggle('active', i === 0);
+          step.classList.toggle('highlight', i === 0);
+        });
+        createProgressIndicator();
+        updateProgressIndicator();
+        if (window.MathJax) window.MathJax.typesetPromise();
+      }
+
+      function createProgressIndicator() {
+        removeProgressIndicator();
+        progressIndicator = document.createElement('div');
+        progressIndicator.className = 'progress-indicator';
+        document.body.appendChild(progressIndicator);
+      }
+
+      function updateProgressIndicator() {
+        if (!progressIndicator || steps.length === 0) return;
+        progressIndicator.textContent = `Paso ${currentStep + 1} de ${steps.length}`;
+      }
+
+      function removeProgressIndicator() {
+        if (progressIndicator) {
+          progressIndicator.remove();
+          progressIndicator = null;
+        }
+      }
+
+      function nextStep() {
+        if (steps.length === 0 || currentStep >= steps.length - 1) return;
+        steps[currentStep].classList.remove('highlight');
+        currentStep++;
+        steps.forEach((step, i) => {
+          step.classList.toggle('active', i <= currentStep);
+        });
+        steps[currentStep].classList.add('highlight');
+        steps[currentStep].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        updateProgressIndicator();
+        if (window.MathJax) window.MathJax.typesetPromise();
+      }
+
+      function previousStep() {
+        if (steps.length === 0 || currentStep <= 0) return;
+        steps[currentStep].classList.remove('highlight');
+        currentStep--;
+        steps[currentStep].classList.add('highlight');
+        steps[currentStep].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        updateProgressIndicator();
+        if (window.MathJax) window.MathJax.typesetPromise();
+      }
+
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.tabs-main') && !e.target.closest('.subtabs')) {
+          nextStep();
+        }
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+          nextStep();
+          e.preventDefault();
+        } else if (e.key === 'ArrowLeft') {
+          previousStep();
+          e.preventDefault();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
