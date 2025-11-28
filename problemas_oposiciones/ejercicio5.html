@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Determinantes Tridiagonales y Criterio de Stolz</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --color-primary: #008080;
+            --color-bg: #FDFBD4;
+            --color-accent: #05472A;
+            --color-yellow: #fff8a6;
+            --color-text: #222222;
+            --color-blue: #1a5276;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.7;
+            padding: 1.5rem;
+            font-size: 1.24rem;
+            cursor: pointer;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 0.85rem;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.09);
+            position: relative;
+        }
+
+        .main-header {
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+        }
+
+        .main-header h1 {
+            font-size: 2.1rem;
+            letter-spacing: 0.09em;
+            margin-bottom: 0.5rem;
+        }
+
+        .content-section {
+            margin-bottom: 2rem;
+        }
+
+        .content-section h2 {
+            color: var(--color-accent);
+            margin-bottom: 1.02rem;
+            border-bottom: 2px solid rgba(0,128,128,0.18);
+            padding-bottom: 0.35rem;
+            font-size: 1.27em;
+        }
+
+        .content-section h3 {
+            color: var(--color-primary);
+            margin-top: 1.17rem;
+            margin-bottom: 0.61rem;
+        }
+
+        .content-section h4 {
+            margin-top: 0.22rem;
+            margin-bottom: 0.35rem;
+            color: var(--color-accent);
+            font-size: 1.06em;
+        }
+
+        .math-block {
+            font-size: 1.19em;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background-color: rgba(0,0,0,0.03);
+            border-radius: 0.5rem;
+            text-align: center;
+            overflow-x: auto;
+        }
+
+        .step {
+            margin-bottom: 1rem;
+            transition: color 3s;
+        }
+
+        .step.new {
+            color: var(--color-blue);
+        }
+
+        .step.normal {
+            color: var(--color-text);
+        }
+
+        .conclusion {
+            background-color: #e8f4fd;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid var(--color-primary);
+        }
+
+        .conclusion-box {
+            display: inline-block;
+            background-color: white;
+            padding: 15px 25px;
+            border-radius: 6px;
+            border: 2px solid var(--color-accent);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .boxed {
+            border-left: 4px solid var(--color-primary);
+            background: rgba(0,128,128,0.05);
+            padding: 1.10rem 1.12rem;
+            margin: 1.01rem 0;
+            border-radius: 0.5rem;
+            font-size: 1.01em;
+        }
+
+        .highlight-strong {
+            border-left-color: var(--color-accent);
+            background: rgba(5, 71, 42, 0.11);
+        }
+
+        .mybox {
+            border-left: 4px solid var(--color-primary);
+            background: rgba(0,128,128,0.05);
+            padding: 1.10rem 1.12rem;
+            margin: 1.01rem 0;
+            border-radius: 0.5rem;
+            font-size: 1.01em;
+            border: 1px solid rgba(0,128,128,0.2);
+        }
+
+        .mybox h4 {
+            margin-top: 0;
+            color: var(--color-primary);
+            border-bottom: 1px solid rgba(0,128,128,0.2);
+            padding-bottom: 0.5rem;
+        }
+
+        .matrix {
+            display: inline-block;
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-header">
+            <h1>Determinantes tridiagonales y criterio de Stolz</h1>
+        </div>
+        
+        <div class="content-section">
+            <h2>EJERCICIO</h2>
+            <div class="step normal" id="step0">
+                <p>Sea \(D_n\) el determinante de orden \(n\) definido por la matriz tridiagonal</p>
+                <div class="math-block">
+                    \[
+                    D_n=
+                    \begin{vmatrix}
+                        2 & 1 & 0 & \cdots & 0 & 0\\
+                        1 & 2 & 1 & \cdots & 0 & 0\\
+                        0 & 1 & 2 & \ddots & \vdots & \vdots\\
+                        \vdots & \vdots & \ddots & \ddots & 1 & 0\\
+                        0 & 0 & \cdots & 1 & 2 & 1\\
+                        0 & 0 & \cdots & 0 & 1 & 2
+                    \end{vmatrix}.
+                    \]
+                </div>
+                <p>Calcular</p>
+                <div class="math-block">
+                    \[
+                    \lim_{n\to\infty}\frac{D_1^2+D_2^2+\cdots +D_n^2}{n^3}.
+                    \]
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2>SOLUCIÓN</h2>
+            
+            <div class="step normal" id="step1">
+                <h3>Cálculo de \(D_1,D_2,D_3\)</h3>
+                <p>Para \(n=1\):</p>
+                <div class="math-block">
+                    \[
+                    D_1=
+                    \begin{vmatrix}
+                        2
+                    \end{vmatrix}
+                    =2.
+                    \]
+                </div>
+                
+                <p>Para \(n=2\):</p>
+                <div class="math-block">
+                    \[
+                    D_2=
+                    \begin{vmatrix}
+                        2 & 1\\[2pt]
+                        1 & 2
+                    \end{vmatrix}
+                    =2\cdot 2-1\cdot 1=3.
+                    \]
+                </div>
+                
+                <p>Para \(n=3\):</p>
+                <div class="math-block">
+                    \[
+                    D_3=
+                    \begin{vmatrix}
+                        2 & 1 & 0\\[2pt]
+                        1 & 2 & 1\\[2pt]
+                        0 & 1 & 2
+                    \end{vmatrix}.
+                    \]
+                </div>
+                <p>Desarrollando por la primera fila:</p>
+                <div class="math-block">
+                    \[
+                    D_3=
+                    2\begin{vmatrix}
+                        2 & 1\\[2pt]
+                        1 & 2
+                    \end{vmatrix}
+                    -
+                    1\begin{vmatrix}
+                        1 & 1\\[2pt]
+                        0 & 2
+                    \end{vmatrix}
+                    =
+                    2(4-1)-(2-0)=6-2=4.
+                    \]
+                </div>
+                
+                <p>Estos valores</p>
+                <div class="math-block">
+                    \[
+                    D_1=2,\quad D_2=3,\quad D_3=4
+                    \]
+                </div>
+                <p>sugieren la conjetura</p>
+                <div class="math-block">
+                    \[
+                    D_n=n+1.
+                    \]
+                </div>
+            </div>
+            
+            <div class="step normal" id="step2">
+                <h3>Relación de recurrencia para \(D_n\)</h3>
+                <p>Tomemos \(D_n\) y desarrollemos por la primera fila:</p>
+                <div class="math-block">
+                    \[
+                    D_n=
+                    \begin{vmatrix}
+                        2 & 1 & 0 & \cdots & 0 & 0\\
+                        1 & 2 & 1 & \cdots & 0 & 0\\
+                        0 & 1 & 2 & \ddots & \vdots & \vdots\\
+                        \vdots & \vdots & \ddots & \ddots & 1 & 0\\
+                        0 & 0 & \cdots & 1 & 2 & 1\\
+                        0 & 0 & \cdots & 0 & 1 & 2
+                    \end{vmatrix}.
+                    \]
+                </div>
+                
+                <p>Desarrollo por la primera fila:</p>
+                <div class="math-block">
+                    \[
+                    D_n
+                    =2\,D_{n-1}
+                    -1\cdot M_{1,2},
+                    \]
+                </div>
+                <p>donde \(D_{n-1}\) es el determinante que se obtiene eliminando la primera fila y la primera columna, y \(M_{1,2}\) es el menor que se obtiene eliminando la primera fila y la segunda columna:</p>
+                <div class="math-block">
+                    \[
+                    M_{1,2}=
+                    \begin{vmatrix}
+                        1 & 1 & 0 & \cdots & 0\\
+                        0 & 2 & 1 & \ddots & \vdots\\
+                        \vdots & \ddots & \ddots & \ddots & 1\\
+                        0 & \cdots & 0 & 1 & 2
+                    \end{vmatrix}.
+                    \]
+                </div>
+                
+                <p>Restamos a la primera fila la segunda:</p>
+                <div class="math-block">
+                    \[
+                    \text{F}_1\leftarrow \text{F}_1-\text{F}_2
+                    \quad\Rightarrow\quad
+                    \begin{vmatrix}
+                        1 & -1 & -1 & \cdots & -1\\
+                        0 & 2  &  1 & \ddots & \vdots\\
+                        \vdots & \ddots & \ddots & \ddots & 1\\
+                        0 & \cdots & 0 & 1 & 2
+                    \end{vmatrix}.
+                    \]
+                </div>
+                <p>Ahora desarrollamos por la primera columna: el único elemento no nulo de esa columna es el \(1\) de la primera fila, y el menor correspondiente es precisamente el determinante tridiagonal de orden \(n-2\):</p>
+                <div class="math-block">
+                    \[
+                    \begin{vmatrix}
+                        2 & 1 & 0 & \cdots & 0\\
+                        1 & 2 & \ddots & \ddots & \vdots\\
+                        0 & \ddots & \ddots & 1 & 0\\
+                        \vdots & \ddots & 1 & 2 & 1\\
+                        0 & \cdots & 0 & 1 & 2
+                    \end{vmatrix}
+                    = D_{n-2}.
+                    \]
+                </div>
+                <p>Por tanto,</p>
+                <div class="math-block">
+                    \[
+                    M_{1,2}=D_{n-2}
+                    \quad\text{y}\quad
+                    D_n=2D_{n-1}-D_{n-2},\qquad n\ge 3.
+                    \]
+                </div>
+            </div>
+            
+            <div class="step normal" id="step3">
+                <h3>Demostración por inducción: \(D_n=n+1\)</h3>
+                <p><strong>Base de inducción:</strong></p>
+                <div class="math-block">
+                    \[
+                    D_1=2=1+1,\qquad D_2=3=2+1.
+                    \]
+                </div>
+                
+                <p><strong>Paso inductivo:</strong> Supongamos cierto que</p>
+                <div class="math-block">
+                    \[
+                    D_{n-1}=n,\qquad D_{n-2}=n-1.
+                    \]
+                </div>
+                <p>Entonces, usando la recurrencia:</p>
+                <div class="math-block">
+                    \[
+                    D_n=2D_{n-1}-D_{n-2}=2n-(n-1)=n+1.
+                    \]
+                </div>
+                <p>Por inducción completa,</p>
+                <div class="math-block">
+                    \[
+                    \boxed{D_n=n+1\quad\text{para todo }n\in\mathbb{N}.}
+                    \]
+                </div>
+            </div>
+            
+            <div class="step normal" id="step4">
+                <h3>Reescritura del límite</h3>
+                <p>Sustituimos \(D_k=k+1\) en el límite:</p>
+                <div class="math-block">
+                    \[
+                    \frac{D_1^2+\cdots +D_n^2}{n^3}
+                    =
+                    \frac{2^2+3^2+\cdots +(n+1)^2}{n^3}.
+                    \]
+                </div>
+                <p>Definimos las sucesiones</p>
+                <div class="math-block">
+                    \[
+                    a_n=2^2+3^2+\cdots +(n+1)^2,\qquad b_n=n^3.
+                    \]
+                </div>
+                <p>Nuestro límite es \(\displaystyle\lim_{n\to\infty}\frac{a_n}{b_n}\).</p>
+                
+                <div class="mybox">
+                    <h4>Criterio de Stolz–Cesàro para cocientes</h4>
+                    <p>Sean \((a_n)\) y \((b_n)\) sucesiones reales tales que:</p>
+                    <ul>
+                        <li>\(b_n\) es estrictamente creciente y \(b_n\to +\infty\).</li>
+                        <li>Existe el límite
+                        \[
+                        \lim_{n\to\infty}\frac{a_{n+1}-a_n}{b_{n+1}-b_n}=L\in\mathbb{R}\cup\{\pm\infty\}.
+                        \]
+                        </li>
+                    </ul>
+                    <p>Entonces existe
+                    \[
+                    \lim_{n\to\infty}\frac{a_n}{b_n}
+                    \quad\text{y vale el mismo valor }L.
+                    \]
+                    Este criterio es especialmente útil cuando \(\dfrac{a_n}{b_n}\) es difícil de tratar directamente, pero las diferencias \(a_{n+1}-a_n\) y \(b_{n+1}-b_n\) se simplifican mucho (por ejemplo, cuando \(a_n\) es una suma parcial).</p>
+                </div>
+                
+                <p>En nuestro caso, \(b_n=n^3\) es estrictamente creciente y \(b_n\to +\infty\), luego podemos aplicar Stolz–Cesàro.</p>
+            </div>
+            
+            <div class="step normal" id="step5">
+                <h3>Aplicación del criterio de Stolz–Cesàro</h3>
+                <p>Calculamos primero las diferencias:</p>
+                <div class="math-block">
+                    \[
+                    a_{n+1}=2^2+3^2+\cdots +(n+1)^2+(n+2)^2,
+                    \]
+                </div>
+                <p>por lo que</p>
+                <div class="math-block">
+                    \[
+                    a_{n+1}-a_n=(n+2)^2.
+                    \]
+                </div>
+                
+                <p>Por otra parte,</p>
+                <div class="math-block">
+                    \[
+                    b_{n+1}-b_n=(n+1)^3-n^3
+                    =3n^2+3n+1.
+                    \]
+                </div>
+                
+                <p>El criterio de Stolz–Cesàro nos da:</p>
+                <div class="math-block">
+                    \[
+                    \lim_{n\to\infty}\frac{a_n}{b_n}
+                    =
+                    \lim_{n\to\infty}\frac{a_{n+1}-a_n}{b_{n+1}-b_n}
+                    =
+                    \lim_{n\to\infty}\frac{(n+2)^2}{3n^2+3n+1}.
+                    \]
+                </div>
+                
+                <p>Dividimos numerador y denominador por \(n^2\):</p>
+                <div class="math-block">
+                    \[
+                    \lim_{n\to\infty}\frac{(n+2)^2}{3n^2+3n+1}
+                    =
+                    \lim_{n\to\infty}
+                    \frac{1+\dfrac{4}{n}+\dfrac{4}{n^2}}{3+\dfrac{3}{n}+\dfrac{1}{n^2}}
+                    =\frac{1}{3}.
+                    \]
+                </div>
+            </div>
+            
+            <div class="step normal" id="step6">
+                <h3>Conclusión</h3>
+                <p>Por tanto,</p>
+                <div class="conclusion-box">
+                    \[
+                    \boxed{
+                        \lim_{n\to\infty}\frac{D_1^2+D_2^2+\cdots +D_n^2}{n^3}
+                        =\frac{1}{3}.
+                    }
+                    \]
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Haz clic en cualquier parte para avanzar en la explicación</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Obtener todos los pasos
+            const steps = document.querySelectorAll('.step');
+            let currentStep = 0;
+            
+            // Ocultar todos los pasos excepto el primero
+            for (let i = 1; i < steps.length; i++) {
+                steps[i].style.display = 'none';
+            }
+            
+            // Función para mostrar el siguiente paso
+            function showNextStep() {
+                if (currentStep < steps.length) {
+                    // Mostrar el paso actual
+                    steps[currentStep].style.display = 'block';
+                    
+                    // Resaltar en azul
+                    steps[currentStep].classList.remove('normal');
+                    steps[currentStep].classList.add('new');
+                    
+                    // Desplazar la vista hacia el paso actual
+                    steps[currentStep].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Después de 3 segundos, cambiar a negro
+                    setTimeout(() => {
+                        steps[currentStep].classList.remove('new');
+                        steps[currentStep].classList.add('normal');
+                    }, 3000);
+                    
+                    currentStep++;
+                }
+            }
+            
+            // Escuchar clics en cualquier parte del documento
+            document.addEventListener("click", showNextStep);
+            
+            // Mostrar el primer paso al cargar la página
+            setTimeout(showNextStep, 500);
+        });
+    </script>
+</body>
+</html>

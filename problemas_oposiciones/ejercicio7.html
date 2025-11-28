@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raíces comunes en polinomios cúbicos</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --color-primary: #0d9488;
+            --color-bg: #fdf6e3;
+            --color-accent: #065f46;
+            --color-yellow: #fef9c3;
+            --color-text: #1e293b;
+            --color-blue: #2563eb;
+            --color-step-normal: #334155;
+            --color-step-new: #1e40af;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #fdf6e3 0%, #f8fafc 100%);
+            color: var(--color-text);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 1800px;
+            margin: 1.2rem auto;
+            padding: 0 1rem;
+            gap: 1.8rem;
+            height: calc(100vh - 180px);
+        }
+
+        .column {
+            flex: 1;
+            min-width: 350px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column-header {
+            background: linear-gradient(to right, var(--color-primary), #0d7a70);
+            color: white;
+            padding: 1.4rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        /* CONTENEDOR DE SCROLL CON BARRAS SIEMPRE VISIBLES */
+        .steps-wrapper {
+            flex-grow: 1;
+            overflow-y: scroll; /* Esto fuerza la barra de desplazamiento NATIVA */
+            padding: 0 1rem 1rem 1rem;
+            margin-right: -17px; /* Compensar el ancho de la barra de desplazamiento */
+            margin-bottom: -17px; /* Compensar la barra horizontal si aparece */
+        }
+
+        .steps-container {
+            padding: 1.8rem 0.5rem 0 1.3rem;
+            min-height: 100%;
+        }
+
+        .step {
+            margin-bottom: 2rem;
+            padding: 1.4rem;
+            border-radius: 14px;
+            border-left: 4px solid #cbd5e1;
+            background: #f8fafc;
+            position: relative;
+            transition: all 0.4s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+
+        .step.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+
+        .step-content p {
+            margin: 0.9rem 0;
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        .math-block {
+            margin: 1.4rem 0;
+            padding: 1.2rem;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid var(--color-primary);
+            text-align: center;
+            overflow-x: auto;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+            font-size: 1.2rem;
+        }
+
+        .conclusion-box {
+            display: inline-block;
+            background: white;
+            padding: 1.2rem 2.2rem;
+            border-radius: 10px;
+            border: 2px solid var(--color-accent);
+            font-weight: bold;
+            font-size: 1.4rem;
+            margin: 1.2rem 0;
+        }
+
+        .highlight-blue {
+            color: var(--color-blue) !important;
+            border-left-color: var(--color-blue) !important;
+            background-color: #dbeafe !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15) !important;
+        }
+
+        .zoom-btn {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.2rem;
+            background: rgba(255,255,255,0.85);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--color-primary);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            transition: all 0.25s;
+            font-weight: bold;
+        }
+
+        .zoom-btn:hover {
+            background: white;
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Zoom overlay */
+        #zoom-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.88);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        #zoom-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .zoom-content {
+            background: white;
+            border-radius: 20px;
+            width: 92%;
+            max-width: 1100px;
+            max-height: 90vh;
+            overflow: auto;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            position: relative;
+        }
+
+        .zoom-header {
+            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+            color: white;
+            padding: 1.4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.4rem;
+        }
+
+        .close-zoom {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .zoom-body {
+            padding: 2.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+                min-height: calc(100vh - 180px);
+            }
+            .column {
+                min-width: 100%;
+            }
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            .steps-wrapper {
+                margin-right: 0;
+                margin-bottom: 0;
+                padding: 0 1rem 1rem 1rem;
+            }
+            .steps-container {
+                padding: 1.8rem;
+            }
+        }
+
+        /* Animation for new steps */
+        @keyframes flashBlue {
+            0% { color: var(--color-blue); border-left-color: var(--color-blue); background-color: #dbeafe; }
+            70% { color: var(--color-blue); border-left-color: var(--color-blue); background-color: #dbeafe; }
+            100% { color: var(--color-text); border-left-color: #cbd5e1; background-color: #f8fafc; }
+        }
+
+        .step.new {
+            animation: flashBlue 3s forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Raíces comunes en polinomios cúbicos</h1>
+    </div>
+
+    <div class="container">
+        <div class="column">
+            <div class="column-header">Pasos 1-5</div>
+            <div class="steps-wrapper">
+                <div class="steps-container" id="left-column">
+                    <!-- Steps will be populated by JS -->
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <div class="column-header">Pasos 6-11</div>
+            <div class="steps-wrapper">
+                <div class="steps-container" id="right-column">
+                    <!-- Steps will be populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zoom overlay -->
+    <div id="zoom-overlay">
+        <div class="zoom-content">
+            <div class="zoom-header">
+                <h2 id="zoom-title">Paso ampliado</h2>
+                <button class="close-zoom" id="close-zoom">&times;</button>
+            </div>
+            <div class="zoom-body" id="zoom-body">
+                <!-- Zoom content will be populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Steps data
+        const steps = [
+            {
+                id: 0,
+                title: "EJERCICIO",
+                content: [
+                    { type: 'text', value: "Obtener los valores de \\(p\\) y \\(q\\) para que las ecuaciones" },
+                    { 
+                        type: 'math', 
+                        value: "\\begin{cases} x^3 - 6x^2 + px - 3 = 0,\\\\[2pt] x^3 - x^2 + qx + 2 = 0, \\end{cases}" 
+                    },
+                    { type: 'text', value: "tengan dos raíces comunes." }
+                ]
+            },
+            {
+                id: 1,
+                title: "Planteamiento",
+                content: [
+                    { type: 'text', value: "Sea \\(x_1,x_2,x_3\\) el conjunto de soluciones de" },
+                    { type: 'math', value: "x^3 - 6x^2 + px - 3 = 0," },
+                    { type: 'text', value: "y \\(x_1,x_2,x_4\\) el conjunto de soluciones de" },
+                    { type: 'math', value: "x^3 - x^2 + qx + 2 = 0." },
+                    { type: 'text', value: "Es decir, las dos raíces comunes son \\(x_1\\) y \\(x_2\\), mientras que \\(x_3\\) es la tercera raíz del primer polinomio y \\(x_4\\) la tercera raíz del segundo." }
+                ]
+            },
+            {
+                id: 2,
+                title: "Aplicación de las fórmulas de Vieta",
+                content: [
+                    { type: 'text', value: "Para un polinomio" },
+                    { type: 'math', value: "x^3 + ax^2 + bx + c = 0" },
+                    { type: 'text', value: "con raíces \\(r_1,r_2,r_3\\), se cumple:" },
+                    { 
+                        type: 'math', 
+                        value: "r_1 + r_2 + r_3 = -a,\\quad r_1r_2 + r_1r_3 + r_2r_3 = b,\\quad r_1r_2r_3 = -c." 
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Primer polinomio",
+                content: [
+                    { type: 'text', value: "En \\(x^3 - 6x^2 + px - 3 = 0\\) se tiene \\(a=-6\\), \\(b=p\\), \\(c=-3\\). Por tanto:" },
+                    { 
+                        type: 'math', 
+                        value: "\\begin{cases} x_1 + x_2 + x_3 = 6,\\\\[4pt] x_1x_2 + x_1x_3 + x_2x_3 = p,\\\\[4pt] x_1x_2x_3 = 3. \\end{cases}" 
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "Segundo polinomio",
+                content: [
+                    { type: 'text', value: "En \\(x^3 - x^2 + qx + 2 = 0\\) se tiene \\(a=-1\\), \\(b=q\\), \\(c=2\\). Por tanto:" },
+                    { 
+                        type: 'math', 
+                        value: "\\begin{cases} x_1 + x_2 + x_4 = 1,\\\\[4pt] x_1x_2 + x_1x_4 + x_2x_4 = q,\\\\[4pt] x_1x_2x_4 = -2. \\end{cases}" 
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Relaciones entre \\(x_3\\) y \\(x_4\\)",
+                content: [
+                    { type: 'text', value: "Restando las ecuaciones de las sumas:" },
+                    { 
+                        type: 'math', 
+                        value: "(x_1 + x_2 + x_3) - (x_1 + x_2 + x_4) = 6 - 1 \\quad \\Rightarrow \\quad x_3 - x_4 = 5." 
+                    },
+                    { type: 'text', value: "A partir de los productos de tres raíces:" },
+                    { 
+                        type: 'math', 
+                        value: "\\frac{x_1x_2x_3}{x_1x_2x_4} = \\frac{3}{-2} \\quad \\Rightarrow \\quad \\frac{x_3}{x_4} = -\\frac{3}{2}." 
+                    }
+                ]
+            },
+            {
+                id: 6,
+                title: "Resolución del sistema",
+                content: [
+                    { type: 'text', value: "Tenemos el sistema" },
+                    { 
+                        type: 'math', 
+                        value: "\\begin{cases} x_3 - x_4 = 5,\\\\[6pt] \\dfrac{x_3}{x_4} = -\\dfrac{3}{2}, \\end{cases}" 
+                    },
+                    { type: 'text', value: "del que sacamos \\(x_3 = -\\dfrac{3}{2}x_4\\). Sustituyendo:" },
+                    { 
+                        type: 'math', 
+                        value: "-\\frac{3}{2}x_4 - x_4 = 5 \\quad \\Rightarrow \\quad -\\frac{5}{2}x_4 = 5 \\quad \\Rightarrow \\quad x_4 = -2." 
+                    },
+                    { type: 'text', value: "Entonces" },
+                    { type: 'math', value: "x_3 = -\\frac{3}{2}(-2) = 3." }
+                ]
+            },
+            {
+                id: 7,
+                title: "Cálculo de \\(x_1 + x_2\\) y \\(x_1x_2\\)",
+                content: [
+                    { type: 'text', value: "De \\(x_1 + x_2 + x_3 = 6\\) con \\(x_3 = 3\\)," },
+                    { type: 'math', value: "x_1 + x_2 = 6 - 3 = 3." },
+                    { type: 'text', value: "De \\(x_1x_2x_3 = 3\\) con \\(x_3 = 3\\)," },
+                    { type: 'math', value: "x_1x_2 = \\frac{3}{3} = 1." }
+                ]
+            },
+            {
+                id: 8,
+                title: "Cálculo de \\(p\\)",
+                content: [
+                    { type: 'text', value: "En el primer polinomio:" },
+                    { 
+                        type: 'math', 
+                        value: "p = x_1x_2 + x_1x_3 + x_2x_3 = x_1x_2 + x_3(x_1 + x_2) = 1 + 3\\cdot 3 = 10." 
+                    }
+                ]
+            },
+            {
+                id: 9,
+                title: "Cálculo de \\(q\\)",
+                content: [
+                    { type: 'text', value: "En el segundo polinomio:" },
+                    { 
+                        type: 'math', 
+                        value: "q = x_1x_2 + x_1x_4 + x_2x_4 = x_1x_2 + x_4(x_1 + x_2) = 1 + (-2)\\cdot 3 = 1 - 6 = -5." 
+                    }
+                ]
+            },
+            {
+                id: 10,
+                title: "Conclusión",
+                content: [
+                    { type: 'text', value: "Los valores de los parámetros para que las dos ecuaciones cúbicas tengan exactamente dos raíces comunes son" },
+                    { type: 'conclusion', value: "p = 10,\\quad q = -5" }
+                ]
+            }
+        ];
+
+        // DOM elements
+        const leftColumn = document.getElementById('left-column');
+        const rightColumn = document.getElementById('right-column');
+        const zoomOverlay = document.getElementById('zoom-overlay');
+        const zoomTitle = document.getElementById('zoom-title');
+        const zoomBody = document.getElementById('zoom-body');
+        const closeZoom = document.getElementById('close-zoom');
+
+        // Create step element
+        function createStepElement(step) {
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'step';
+            stepDiv.id = `step-${step.id}`;
+            stepDiv.dataset.stepId = step.id;
+            
+            let html = '';
+            
+            if (step.title) {
+                html += `<div class="step-title">${step.title}</div>`;
+            }
+            
+            html += '<div class="step-content">';
+            
+            step.content.forEach(item => {
+                if (item.type === 'math') {
+                    html += `<div class="math-block">\\[${item.value}\\]</div>`;
+                } else if (item.type === 'conclusion') {
+                    html += `<div class="conclusion-box">\\[\\boxed{${item.value}}\\]</div>`;
+                } else {
+                    html += `<p>${item.value}</p>`;
+                }
+            });
+            
+            html += '</div>';
+            
+            // Add zoom button
+            html += `<button class="zoom-btn" onclick="zoomStep(${step.id})">+</button>`;
+            
+            stepDiv.innerHTML = html;
+            return stepDiv;
+        }
+
+        // Render steps
+        function renderSteps() {
+            // Clear containers
+            leftColumn.innerHTML = '';
+            rightColumn.innerHTML = '';
+            
+            // First 5 steps (0-4) in left column
+            for (let i = 0; i < 5; i++) {
+                const stepElement = createStepElement(steps[i]);
+                stepElement.style.display = 'none';
+                leftColumn.appendChild(stepElement);
+            }
+            
+            // Remaining steps (5-10) in right column
+            for (let i = 5; i < steps.length; i++) {
+                const stepElement = createStepElement(steps[i]);
+                stepElement.style.display = 'none';
+                rightColumn.appendChild(stepElement);
+            }
+        }
+
+        // Current step tracking
+        let currentStep = 0;
+
+        // Show next step
+        function showNextStep() {
+            if (currentStep >= steps.length) return;
+            
+            const stepId = currentStep;
+            const stepElement = document.getElementById(`step-${stepId}`);
+            
+            if (stepElement) {
+                // Show the step
+                stepElement.style.display = 'block';
+                stepElement.classList.add('new');
+                
+                // Scroll to the step smoothly
+                stepElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // After 3 seconds, remove the 'new' class
+                setTimeout(() => {
+                    if (stepElement.classList.contains('new')) {
+                        stepElement.classList.remove('new');
+                    }
+                }, 3000);
+                
+                currentStep++;
+            }
+        }
+
+        // Zoom functionality
+        function zoomStep(stepId) {
+            const step = steps.find(s => s.id === stepId);
+            if (!step) return;
+            
+            // Set title
+            zoomTitle.textContent = step.title ? `Paso ${stepId + 1}: ${step.title}` : `Paso ${stepId + 1}`;
+            
+            // Build content
+            let html = '<div class="step zoomed-step">';
+            if (step.title) {
+                html += `<div class="step-title">${step.title}</div>`;
+            }
+            html += '<div class="step-content">';
+            
+            step.content.forEach(item => {
+                if (item.type === 'math') {
+                    html += `<div class="math-block">\\[${item.value}\\]</div>`;
+                } else if (item.type === 'conclusion') {
+                    html += `<div class="conclusion-box">\\[\\boxed{${item.value}}\\]</div>`;
+                } else {
+                    html += `<p>${item.value}</p>`;
+                }
+            });
+            
+            html += '</div></div>';
+            
+            zoomBody.innerHTML = html;
+            
+            // Show overlay
+            zoomOverlay.classList.add('active');
+            
+            // Force MathJax to process the newly added content
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // Close zoom
+        closeZoom.addEventListener('click', () => {
+            zoomOverlay.classList.remove('active');
+        });
+
+        // Close zoom when clicking outside content
+        zoomOverlay.addEventListener('click', (e) => {
+            if (e.target === zoomOverlay) {
+                zoomOverlay.classList.remove('active');
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderSteps();
+            
+            // Show first step after a brief delay
+            setTimeout(showNextStep, 500);
+            
+            // Click anywhere to advance
+            document.addEventListener('click', function(e) {
+                // Don't advance if clicking zoom button or close button
+                if (e.target.classList.contains('zoom-btn') || 
+                    e.target.id === 'close-zoom' || 
+                    e.target.closest('#zoom-overlay')) {
+                    return;
+                }
+                showNextStep();
+            });
+            
+            // Initialize MathJax processing
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+            
+            // Force scrollbars to appear by adding minimal content height
+            setTimeout(() => {
+                // Ensure containers have enough height to trigger scrollbars
+                const minHeight = Math.max(
+                    window.innerHeight * 0.6,
+                    leftColumn.scrollHeight,
+                    rightColumn.scrollHeight
+                );
+                document.querySelectorAll('.steps-container').forEach(el => {
+                    el.style.minHeight = minHeight + 'px';
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html>
+
